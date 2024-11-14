@@ -72,5 +72,5 @@ int main(){
     user* head;
     int n=0;
     AddNewUser(head,n);
-
+    
 }
