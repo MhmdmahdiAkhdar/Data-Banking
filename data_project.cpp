@@ -94,7 +94,7 @@ void AddNewUser(user * &firsttime,int &val){
     //     firsttime->lname=last;
     // }
     
-
+     cout << "\033[1;32mAn account has been created....\033[0m\n";
     return ;
 }
 void choice(user *c, int size){
