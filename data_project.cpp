@@ -70,16 +70,17 @@ int sizereaderclients()
     return size;
 }
 
-void AddNewUser(user *firsttime, int &val)
+void AddNewUser(user *&node, int &val)
 {
-    user *first = new user;
+    string first, last;
+    user *q = new user;
     int x;
     do
     {
         x = 0;
         cout << "Please enter your First Name:  ";
-        getline(cin, first->fname);
-        if (first->fname.length() >= 1)
+        getline(cin, first);
+        if (first.length() >= 1)
             x++;
         else
             cout << "\033[1;31m--> Please enter a valid name.\033[0m" << endl;
@@ -91,18 +92,79 @@ void AddNewUser(user *firsttime, int &val)
     {
         z = 0;
         cout << "Please enter your Last Name:  ";
-        getline(cin, first->lname);
-        if (first->lname.length() >= 1)
+        getline(cin, last);
+        if (last.length() >= 1)
             z++;
         else
             cout << "\033[1;31m--> Please enter a valid name.\033[0m" << endl;
 
     } while (z == 0);
-}
+    user *head, *tail;
+    val += 1;
+    if ((node->next == NULL) && (node->previous == NULL))
+    {
+        // inputs if the pointer is null
+        node->fname = first;
+        node->lname = last;
+        node->userID = val;
+        node->next = nullptr;
+        node->previous = nullptr;
+        head = node;
+        tail = node;
+    }
+    else
+    {
+        // this input is just for the second value
+        node->fname = first;
+        node->lname = last;
+        node->userID = val;
+        node->next = nullptr;
+        node->previous = tail;
+        tail->next = node;
+        tail = node;
+    }
 
+    cout << "\033[1;32mAn account has been created....\033[0m\n";
+    choice(node, val);
+    print(node);
+    return;
+}
+void choice(user *c, int size)
+{
+    char x;
+    cout << "\033[1;33m~Press 1 to login .\n~Press 2 to sighn up.\n~Press 0 to exit.\033[0m " << endl;
+    do
+    {
+        cin >> x;
+        if (x == '2')
+        {
+            cin.ignore();
+            AddNewUser(c, size);
+        }
+        else if (x == '1')
+        {
+            // cin.ignore();
+            // login(c, size);
+        }
+        else if (x == '0')
+        {
+
+            cout << "Thanks for using our service.";
+            break;
+        }
+        else
+        {
+            cout
+                << "\033[1;31m--> Invalid choice.\033[0m" << endl;
+        }
+    } while (x != '1' && x != '2' && x != '0');
+    return;
+}
 int main()
 {
-    user *head;
-    int n = 0;
-    AddNewUser(head, n);
+    user *node = new user();
+    node->next = nullptr;
+    node->previous = nullptr;
+    int size = sizereaderclients();
+    choice(node, size);
 }
