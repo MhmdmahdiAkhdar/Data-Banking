@@ -2,6 +2,8 @@
 #include <string>
 #include <sstream>
 #include <fstream>
+#include <cstring>
+#include <cctype>
 // #include <ctime>
 // #include <chrono>
 // #include<ios>
@@ -45,18 +47,22 @@ struct userList
 
 void choice(user *, int);
 
+void filltxt()
+{
+}
+
 // prints every thing this may be deleted later on
 void print(user *head)
 {
     user *travel = head;
     while (travel != nullptr)
     {
-        cout << travel->fname << "     " << travel->lname << endl;
+        cout << travel->userID << "      " << travel->fname << "     " << travel->lname << endl;
         travel = travel->next;
     }
 }
 
-int sizereaderclients()
+int sizereaderusr()
 {
     fstream file;
     int size = 0;
@@ -70,43 +76,47 @@ int sizereaderclients()
     return size;
 }
 
+void checkname(string &name)
+{
+    bool x;
+    do
+    {
+        x = true;
+        getline(cin, name);
+        for (char c : name)
+        {
+            if (!isalpha(c))
+            {
+                x = false;
+                break;
+            }
+        }
+        if (name.length() < 1)
+            x = false;
+        if (!x)
+            cout << "\033[1;31mInvalid text.\033[0m\nPlease enter a name:";
+
+    } while (!x);
+}
+
 void AddNewUser(user *&node, int &val)
 {
     string first, last;
-    user *q = new user;
     int x;
-    do
-    {
-        x = 0;
-        cout << "Please enter your First Name:  ";
-        getline(cin, first);
-        if (first.length() >= 1)
-            x++;
-        else
-            cout << "\033[1;31m--> Please enter a valid name.\033[0m" << endl;
+    x = 0;
+    cout << "Please enter your First Name:  ";
+    checkname(first);
+    cout << "Please enter your Last Name:  ";
+    checkname(last);
 
-    } while (x == 0);
-
-    int z;
-    do
-    {
-        z = 0;
-        cout << "Please enter your Last Name:  ";
-        getline(cin, last);
-        if (last.length() >= 1)
-            z++;
-        else
-            cout << "\033[1;31m--> Please enter a valid name.\033[0m" << endl;
-
-    } while (z == 0);
     user *head, *tail;
-    val += 1;
     if ((node->next == NULL) && (node->previous == NULL))
     {
         // inputs if the pointer is null
+        cout << "ehwfwef";
         node->fname = first;
         node->lname = last;
-        node->userID = val;
+        node->userID = val + 1;
         node->next = nullptr;
         node->previous = nullptr;
         head = node;
@@ -114,18 +124,26 @@ void AddNewUser(user *&node, int &val)
     }
     else
     {
+        user *travel;
+        travel = node;
         // this input is just for the second value
-        node->fname = first;
-        node->lname = last;
-        node->userID = val;
-        node->next = nullptr;
-        node->previous = tail;
-        tail->next = node;
-        tail = node;
+        while (travel->next != NULL)
+        {
+            cout << "fuck you";
+            travel = travel->next;
+        }
+        travel->fname = first;
+        travel->lname = last;
+        travel->userID = val + 1;
+        travel->next = nullptr;
+        travel->previous = tail;
+        tail->next = travel;
+        tail = travel;
+        head = travel;
     }
 
     cout << "\033[1;32mAn account has been created....\033[0m\n";
-    choice(node, val);
+    choice(node, val + 1);
     print(node);
     return;
 }
@@ -149,13 +167,13 @@ void choice(user *c, int size)
         else if (x == '0')
         {
 
-            cout << "Thanks for using our service.";
+            cout << "Thanks for using our service.\n";
             break;
         }
         else
         {
             cout
-                << "\033[1;31m--> Invalid choice.\033[0m" << endl;
+                << "\033[1;31m--> Invalid choice.\033[0m\n";
         }
     } while (x != '1' && x != '2' && x != '0');
     return;
@@ -165,6 +183,6 @@ int main()
     user *node = new user();
     node->next = nullptr;
     node->previous = nullptr;
-    int size = sizereaderclients();
+    int size = sizereaderusr();
     choice(node, size);
 }
