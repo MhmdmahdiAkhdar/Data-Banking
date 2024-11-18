@@ -43,6 +43,33 @@ struct userList
     user *head, *tail;
 };
 
+void choice(user *, int);
+
+// prints every thing this may be deleted later on
+void print(user *head)
+{
+    user *travel = head;
+    while (travel != nullptr)
+    {
+        cout << travel->fname << "     " << travel->lname << endl;
+        travel = travel->next;
+    }
+}
+
+int sizereaderclients()
+{
+    fstream file;
+    int size = 0;
+    string line;
+    file.open("clients.txt", ios::in);
+    while (getline(file, line))
+    {
+        size++;
+    }
+    file.close();
+    return size;
+}
+
 void AddNewUser(user *firsttime, int &val)
 {
     user *first = new user;
