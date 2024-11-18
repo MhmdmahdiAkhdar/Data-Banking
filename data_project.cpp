@@ -47,10 +47,7 @@ struct userList
 };
 
 void choice(user *, int);
-
-void filltxt()
-{
-}
+void access(user *,int);
 
 // prints every thing this may be deleted later on
 void print(user *head)
@@ -58,11 +55,10 @@ void print(user *head)
     user *travel = head;
     while (travel != nullptr)
     {
-        cout << travel->userID << setw(50) << travel->fname << setw(50) << travel->lname << endl;
+        cout << travel->userID << setw(20) << travel->fname << setw(20) << travel->lname << endl;
         travel = travel->next;
     }
 }
-
 int sizereaderusr()
 {
     fstream file;
@@ -76,7 +72,6 @@ int sizereaderusr()
     file.close();
     return size;
 }
-
 void checkname(string &name)
 {
     bool x;
@@ -99,7 +94,6 @@ void checkname(string &name)
 
     } while (!x);
 }
-
 user* insertAtEnd(user* head, string first, string last) {
     user* tmp = new user;//creates a new pointer
     tmp->fname = first;
@@ -122,26 +116,122 @@ user* insertAtEnd(user* head, string first, string last) {
     tmp->userID = cur->userID + 1; // Increment user ID
     return head; // Return the head of the list
 }
+bool repetion(user *head,string first,string last){
+     user *travel = head;
+    while (travel != nullptr)
+    {
+        if (travel->fname == first && travel->lname == last){
+            cout << "\033[1;31mThere is an account with this name.\033[0m\n";
+            return true;
+        }
+        travel = travel->next;
+    }
+    return false;
+}
+
+string allocation_input(){
+    string choice;
+    bool x;
+    do{
+    cout<<"To access press '1' to sighn-up press '2': ";
+    getline(cin,choice);
+    cout<<choice.length();
+    if ((choice != "1" ||choice != "2")&&choice.length()!=1){
+        cout << "\033[1;31mInvalid input.\033[0m\n";
+        x=false;
+    }
+    else x=true;
+    }while(x==false);
+    return choice;
+}
+
+
 
 void AddNewUser(user *&node, int &val)
 {
     string first, last;
-    int x;
+    bool x;
     val=val+1;
-    x = 0;
+    string q="2";
+    do{
     cout << "Please enter your First Name:  ";
     checkname(first);
     cout << "Please enter your Last Name:  ";
     checkname(last);
+    x=repetion(node,first,last);
+    if(x==true){
+        q=allocation_input();
+        if( q =="1"){
+          access(node, val);
+          break;
+        }
+    }
+    }while(x==true);
+    if(q=="2"){
     node=insertAtEnd(node,first,last);
-    cout << "\033[1;32mAn account has been created....\033[0m\n";
-    choice(node, val + 1);
+    cout << "\033[1;32mAn account has been created....\nYour ID is: "<<val<<"\033[0m\n";
+    choice(node, val);
+    }
     return;
 }
+bool checklogin(user* head,string first,string last,int ID){
+    user *travel = head;
+        while (travel != nullptr)
+        {
+            if (travel->fname == first && travel->lname == last && travel->userID==ID){
+                return true;
+            }
+            travel = travel->next;
+        }
+        cout << "\033[1;31mThere is no account with this information.\033[0m\n";
+        return false;
+}
+
+void access(user *node,int size){
+    int ID;
+    bool x;
+    do{
+        string firstname,lastname;
+        cout<<"Please enter your ID: ";
+        cin>>ID;
+        cin.ignore();
+        cout<<"Please enter your first name: ";
+        checkname(firstname);
+        cout<<"Please enter your last name: ";
+        checkname(lastname);
+        x=checklogin(node,firstname,lastname,ID);
+    }while(x==false);
+    return ;
+}
+void add_to_txt_file(user* head,int size){
+    fstream input;
+    user *travel = head;
+    // if(size-1==0){
+    input.open("input.txt", ios::out);
+        while (travel != nullptr)
+        {
+        input <<"-"<< travel->userID << "," << travel->fname << "," << travel->lname;
+        if(size!=travel->userID){
+            input<<endl;
+        }
+        travel = travel->next;
+        }
+    input.close();
+    // }
+    // else{
+    //     input.open("input.txt", ios::app);
+    //     while(travel!=nullptr){
+    //             input <<endl<<"-"<< travel->userID << "," << travel->fname << "," << travel->lname;
+    //             travel = travel->next;
+    //     }
+    //     input.close();
+    // }
+}
+
 void choice(user *c, int size)
 {
     char x;
-    cout << "\033[1;33m~Press 1 to login .\n~Press 2 to sighn up.\n~Press 0 to exit.\033[0m " << endl;
+    cout << "\033[1;33m~Press 1 to access a users account .\n~Press 2 to add a user.\n~Press 0 to exit.\033[0m " << endl;
     do
     {
         cin >> x;
@@ -152,20 +242,20 @@ void choice(user *c, int size)
         }
         else if (x == '1')
         {
-            // cin.ignore();
-            // login(c, size);
+            cin.ignore();
+            access(c, size);
         }
         else if (x == '0')
         {
             print(c);
+            add_to_txt_file(c,size);
             cout << "\033[30mThanks for using our service.\033[0m\n";
 
             break;
         }
         else
         {
-            cout
-                << "\033[1;31m--> Invalid choice.\033[0m\n";
+            cout<< "\033[1;31m--> Invalid choice.\033[0m\n";
         }
     } while (x != '1' && x != '2' && x != '0');
     return;
@@ -173,8 +263,6 @@ void choice(user *c, int size)
 int main()
 {
     user *node = new user();
-    // node->next = nullptr;
-    // node->previous = nullptr;
     node=NULL;
     int size = sizereaderusr();
     choice(node, size);
