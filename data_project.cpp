@@ -6,6 +6,8 @@
 // #include <chrono>
 // #include<ios>
 
+
+
 // .csv this is for the exel file to go from one to another we make the parameter ','
 
 // to get the current time
@@ -39,6 +41,18 @@ struct userList {
     user *head, *tail;
 };
 
+void choice(user * , int);
+
+//prints every thing this may be deleted later on
+void print(user *head){
+    user *travel=head;
+    while(travel!=nullptr){
+        cout<<travel->fname<<"     "<<travel->lname<<endl;
+        travel=travel->next;
+    }
+}
+
+
 int sizereaderclients()
 {
     fstream file;
@@ -53,7 +67,7 @@ int sizereaderclients()
     return size;
 }
 
-void AddNewUser(user * &firsttime,int &val){
+void AddNewUser(user * &node,int &val){
     string first,last;
     user *q=new user;
     int x;
@@ -79,22 +93,31 @@ void AddNewUser(user * &firsttime,int &val){
             cout << "\033[1;31m--> Please enter a valid name.\033[0m" << endl;
         
     }while(z==0);
-    // if(firsttime==NULL){
-    //     firsttime->fname = first;
-    //     firsttime->lname = last;
-    //     firsttime->next=nullptr;
-    //     firsttime->previous=nullptr;
-    //     cout<<"fuck you";
-    // }
-    // else{
-    //     while(firsttime!=NULL){
-    //         firsttime->next;
-    //     }
-    //     firsttime->fname = first;
-    //     firsttime->lname=last;
-    // }
+    user *head,*tail;
+    val+=1;
+    if((node->next==NULL)&&(node->previous==NULL)){
+       //inputs if the pointer is null
+        node->fname = first;
+        node->lname = last;
+        node->userID=val;
+        node->next=nullptr;
+        node->previous=nullptr;
+        head=node;
+        tail=node;
+    }
+    else{
+        //this input is just for the second value
+        node->fname = first;
+        node->lname = last;
+        node->userID=val;
+         node->next=nullptr;
+         node->previous=tail;
+         tail->next=node;
+         tail=node;
+    }
     
      cout << "\033[1;32mAn account has been created....\033[0m\n";
+    choice(node,val);
     return ;
 }
 void choice(user *c, int size){
@@ -127,10 +150,11 @@ void choice(user *c, int size){
     } while (x != '1' && x != '2' && x != '0');
     return;
 }
-int main(){
-    user* head=new user;
-    head=NULL;
-    user*point =nullptr;
+int main(){    
+    user* node =new user();
+    // user*node =nullptr;
+    node->next = nullptr;
+    node->previous = nullptr;
     int size=sizereaderclients();
-    choice(point,size);
+    choice(node,size);
 }
