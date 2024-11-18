@@ -4,6 +4,7 @@
 #include <fstream>
 #include <cstring>
 #include <cctype>
+#include<iomanip>
 // #include <ctime>
 // #include <chrono>
 // #include<ios>
@@ -57,7 +58,7 @@ void print(user *head)
     user *travel = head;
     while (travel != nullptr)
     {
-        cout << travel->userID << "      " << travel->fname << "     " << travel->lname << endl;
+        cout << travel->userID << setw(50) << travel->fname << setw(50) << travel->lname << endl;
         travel = travel->next;
     }
 }
@@ -99,52 +100,42 @@ void checkname(string &name)
     } while (!x);
 }
 
+user* insertAtEnd(user* head, string first, string last) {
+    user* tmp = new user;//creates a new pointer
+    tmp->fname = first;
+    tmp->lname = last;
+    tmp->next = nullptr;//in the last node the next is allways null
+
+    if (head == nullptr) {//if there is no other pointers
+        tmp->userID = 1; // Assign first user ID
+        tmp->previous = nullptr;
+        return tmp; // New head
+    }
+
+    user* cur = head;
+    while (cur->next != nullptr) {
+        cur = cur->next; // Traverse to the end of the list
+    }
+
+    cur->next = tmp; // Link the new node
+    tmp->previous = cur; // Set the previous pointer
+    tmp->userID = cur->userID + 1; // Increment user ID
+    return head; // Return the head of the list
+}
+
 void AddNewUser(user *&node, int &val)
 {
     string first, last;
     int x;
+    val=val+1;
     x = 0;
     cout << "Please enter your First Name:  ";
     checkname(first);
     cout << "Please enter your Last Name:  ";
     checkname(last);
-
-    user *head, *tail;
-    if ((node->next == NULL) && (node->previous == NULL))
-    {
-        // inputs if the pointer is null
-        cout << "ehwfwef";
-        node->fname = first;
-        node->lname = last;
-        node->userID = val + 1;
-        node->next = nullptr;
-        node->previous = nullptr;
-        head = node;
-        tail = node;
-    }
-    else
-    {
-        user *travel;
-        travel = node;
-        // this input is just for the second value
-        while (travel->next != NULL)
-        {
-            cout << "fuck you";
-            travel = travel->next;
-        }
-        travel->fname = first;
-        travel->lname = last;
-        travel->userID = val + 1;
-        travel->next = nullptr;
-        travel->previous = tail;
-        tail->next = travel;
-        tail = travel;
-        head = travel;
-    }
-
+    node=insertAtEnd(node,first,last);
     cout << "\033[1;32mAn account has been created....\033[0m\n";
     choice(node, val + 1);
-    print(node);
     return;
 }
 void choice(user *c, int size)
@@ -166,8 +157,9 @@ void choice(user *c, int size)
         }
         else if (x == '0')
         {
+            print(c);
+            cout << "\033[30mThanks for using our service.\033[0m\n";
 
-            cout << "Thanks for using our service.\n";
             break;
         }
         else
@@ -181,8 +173,9 @@ void choice(user *c, int size)
 int main()
 {
     user *node = new user();
-    node->next = nullptr;
-    node->previous = nullptr;
+    // node->next = nullptr;
+    // node->previous = nullptr;
+    node=NULL;
     int size = sizereaderusr();
     choice(node, size);
 }
