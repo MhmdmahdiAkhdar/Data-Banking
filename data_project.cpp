@@ -187,6 +187,35 @@ bool checklogin(user* head,string first,string last,int ID){
         return false;
 }
 
+void accesschoice(user *node,int size){
+     char x;
+    cout << "\033[1;33m~Press 1 to add account .\n~Press 2 to do a transaction.\n~Press 0 to Return.\033[0m " << endl;
+    do
+    {
+        cin >> x;
+        if (x == '2')
+        {
+            cin.ignore();
+            // AddNewUser(c, size);
+        }
+        else if (x == '1')
+        {
+            cin.ignore();
+            // access(c, size);
+        }
+        else if (x == '0')
+        {
+            choice(node,size);
+            break;
+        }
+        else
+        {
+            cout<< "\033[1;31m--> Invalid choice.\033[0m\n";
+        }
+    } while (x != '1' && x != '2' && x != '0');
+    return;
+}
+
 void access(user *node,int size){
     int ID;
     bool x;
@@ -201,6 +230,7 @@ void access(user *node,int size){
         checkname(lastname);
         x=checklogin(node,firstname,lastname,ID);
     }while(x==false);
+    accesschoice(node,size);
     return ;
 }
 void add_to_txt_file(user* head,int size){
@@ -231,7 +261,7 @@ void add_to_txt_file(user* head,int size){
 void choice(user *c, int size)
 {
     char x;
-    cout << "\033[1;33m~Press 1 to access a users account .\n~Press 2 to add a user.\n~Press 0 to exit.\033[0m " << endl;
+    cout << "\033[1;33m~Press 1 to access a user's account .\n~Press 2 to add a account.\n~Press 0 to exit.\033[0m " << endl;
     do
     {
         cin >> x;
