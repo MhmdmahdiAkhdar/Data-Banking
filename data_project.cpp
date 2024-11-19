@@ -9,8 +9,6 @@
 // #include <chrono>
 // #include<ios>
 
-// .csv this is for the exel file to go from one to another we make the parameter ','
-
 // to get the current time
 // time_t currentTime = time(NULL);
 // struct tm *localTime = localtime(&currentTime);
@@ -244,7 +242,7 @@ bool checklogin(user *head, string first, string last, int ID)
 
 void accesschoice(user *node,int size){
      char x;
-    cout << "\033[1;33m~Press 1 to add account .\n~Press 2 to do a transaction.\n~Press 0 to Return.\033[0m " << endl;
+    cout <<endl<< "\033[1;33m~Press 1 to add an account .\n~Press 2 to do a transaction.\n~Press 0 to Return.\033[0m " << endl;
     do
     {
         cin >> x;
@@ -271,6 +269,25 @@ void accesschoice(user *node,int size){
     return;
 }
 
+void ID_checker(int &ID)
+{
+    string id;
+    bool x;
+    do{
+    cout << "\033[1;33mEnter your ID: \033[0m";
+    getline(cin,id);
+    for (char c : id)
+        {
+            if (!isdigit(c))
+            {
+                x = false;
+                break;
+            }
+            else x= true;
+        }
+    }while(x==false);
+    ID=stoi(id);
+}
 void access(user *node, int size)
 {
     int ID;
@@ -278,18 +295,13 @@ void access(user *node, int size)
     do
     {
         string firstname, lastname;
-        cout << "Please enter your ID: ";
-        cin >> ID;
-        cin.ignore();
-        cout << "Please enter your first name: ";
+        ID_checker(ID);
+        cout << "\033[1;33menter your first name: \033[0m";
         checkname(firstname);
-        cout << "Please enter your last name: ";
+        cout << "\033[1;33menter your last name: \033[0m";
         checkname(lastname);
         x = checklogin(node, firstname, lastname, ID);
     } while (x == false);
-    return;
-        x=checklogin(node,firstname,lastname,ID);
-    }while(x==false);
     accesschoice(node,size);
     return ;
 }
@@ -360,9 +372,10 @@ void choice(user *c, int size)
 }
 int main()
 {
-    user *node = new user();
+    user *node = new user;
     node = NULL;
     readfromfile(node);
     int size = sizereaderusr();
     choice(node, size);
+    delete node;
 }
