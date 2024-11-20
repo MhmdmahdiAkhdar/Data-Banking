@@ -166,7 +166,7 @@ bool repetion(user *head, string first, string last)
     {
         if (travel->fname == first && travel->lname == last)
         {
-            cout << "\033[1;31mThere is an account with this name.\033[0m\n";
+            cout << "\033[1;31m--> There is an account with this name.\033[0m\n";
             return true;
         }
         travel = travel->next;
@@ -202,9 +202,9 @@ void AddNewUser(user *&node, int &val)
     string q = "2";
     do
     {
-        cout << "Please enter your First Name:  ";
+        cout << "--> Enter First Name:  ";
         checkname(first);
-        cout << "Please enter your Last Name:  ";
+        cout << "-->Enter Last Name:  ";
         checkname(last);
         x = repetion(node, first, last);
         if (x == true)
@@ -220,7 +220,7 @@ void AddNewUser(user *&node, int &val)
     if (q == "2")
     {
         node = insertAtEnd(node, first, last);
-        cout << "\033[1;32mAn account has been created....\nYour ID is: " << val << "\033[0m\n";
+        cout << "\033[1;32m--> An account has been created....\nYour ID is: " << val << "\033[0m\n";
         choice(node, val);
     }
     return;
@@ -236,22 +236,22 @@ user *checklogin(user *head, string first, string last, int ID)
         }
         travel = travel->next;
     }
-    cout << "\033[1;31mThere is no account with this information.\033[0m\n";
+    cout << "\033[1;31m--> There is no account with this information.\033[0m\n";
     return NULL;
 }
 
 
-user *add_new_account(user *node,int size){
-    string IBAN;
-    cout << "\033[1;33Enter the IBAN of the new account: \033[0m";
-    //insted of the getline add a confirmation
-    getline(cin,IBAN);
-    
-}
+// user *add_new_account(user *node,int size){
+//     string IBAN;
+//     cout << "\033[1;33Enter the IBAN of the new account: \033[0m";
+//    // insted of the getline add a confirmation
+//     getline(cin,IBAN);
+
+// }
 
 void accesschoice(user *node,int size){
      char x;
-    cout <<endl<< "\033[1;33m~Press 1 to add an account .\n~Press 2 to do a transaction.\n~Press 0 to Return.\033[0m " << endl;
+    cout <<endl<< "\033[1;33m--> ~Press 1 to add an account .\n--> ~Press 2 to do a transaction.\n--> ~Press 0 to Return.\033[0m " << endl;
     do
     {
         cin >> x;
@@ -284,7 +284,7 @@ void ID_checker(int &ID)
     string id;
     bool x;
     do{
-    cout << "\033[1;33mEnter your ID: \033[0m";
+    cout << "\033[1;33m-->Enter your ID: \033[0m";
     getline(cin,id);
     for (char c : id)
         {
@@ -306,9 +306,9 @@ void access(user *node, int size)
     {
         string firstname, lastname;
         ID_checker(ID);
-        cout << "\033[1;33Eenter your first name: \033[0m";
+        cout << "\033[1;33--> Eenter your first name: \033[0m";
         checkname(firstname);
-        cout << "\033[1;33Eenter your last name: \033[0m";
+        cout << "\033[1;33--> Eenter your last name: \033[0m";
         checkname(lastname);
         chosen = checklogin(node, firstname, lastname, ID);
     } while (chosen == NULL);
@@ -351,7 +351,7 @@ void add_to_txt_file(user *node)
 void choice(user *c, int size)
 {
     char x;
-    cout << "\033[1;33m~Press 1 to access a user.\n~Press 2 to add a account.\n~Press 0 to exit.\033[0m " << endl;
+    cout << "\033[1;33m--> ~Press 1 to access a user.\n--> ~Press 2 to add a account.\n--> ~Press 0 to exit.\033[0m " << endl;
     do
     {
         cin >> x;
@@ -369,7 +369,7 @@ void choice(user *c, int size)
         {
             print(c);
             add_to_txt_file(c);
-            cout << "\033[30mThanks for using our service.\033[0m\n";
+            cout << "\033[30m-->Thanks for using our service.<--\033[0m\n";
 
             break;
         }
