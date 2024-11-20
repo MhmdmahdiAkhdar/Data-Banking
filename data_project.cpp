@@ -225,19 +225,28 @@ void AddNewUser(user *&node, int &val)
     }
     return;
 }
-bool checklogin(user *head, string first, string last, int ID)
+user *checklogin(user *head, string first, string last, int ID)
 {
     user *travel = head;
     while (travel != nullptr)
     {
         if (travel->fname == first && travel->lname == last && travel->userID == ID)
         {
-            return true;
+            return travel;
         }
         travel = travel->next;
     }
     cout << "\033[1;31mThere is no account with this information.\033[0m\n";
-    return false;
+    return NULL;
+}
+
+
+user *add_new_account(user *node,int size){
+    string IBAN;
+    cout << "\033[1;33Enter the IBAN of the new account: \033[0m";
+    //insted of the getline add a confirmation
+    getline(cin,IBAN);
+    
 }
 
 void accesschoice(user *node,int size){
@@ -258,7 +267,8 @@ void accesschoice(user *node,int size){
         }
         else if (x == '0')
         {
-            choice(node,size);
+            // choice(node,size);
+            return;
             break;
         }
         else
@@ -291,21 +301,21 @@ void ID_checker(int &ID)
 void access(user *node, int size)
 {
     int ID;
-    bool x;
+    user *chosen;
     do
     {
         string firstname, lastname;
         ID_checker(ID);
-        cout << "\033[1;33menter your first name: \033[0m";
+        cout << "\033[1;33Eenter your first name: \033[0m";
         checkname(firstname);
-        cout << "\033[1;33menter your last name: \033[0m";
+        cout << "\033[1;33Eenter your last name: \033[0m";
         checkname(lastname);
-        x = checklogin(node, firstname, lastname, ID);
-    } while (x == false);
-    accesschoice(node,size);
+        chosen = checklogin(node, firstname, lastname, ID);
+    } while (chosen == NULL);
+    accesschoice(chosen,size);
     return ;
 }
-void add_to_txt_file(user *node, int size)
+void add_to_txt_file(user *node)
 {
     fstream input;
     user *travel = node;
@@ -341,7 +351,7 @@ void add_to_txt_file(user *node, int size)
 void choice(user *c, int size)
 {
     char x;
-    cout << "\033[1;33m~Press 1 to access a user's account .\n~Press 2 to add a account.\n~Press 0 to exit.\033[0m " << endl;
+    cout << "\033[1;33m~Press 1 to access a user.\n~Press 2 to add a account.\n~Press 0 to exit.\033[0m " << endl;
     do
     {
         cin >> x;
@@ -358,7 +368,7 @@ void choice(user *c, int size)
         else if (x == '0')
         {
             print(c);
-            add_to_txt_file(c, size);
+            add_to_txt_file(c);
             cout << "\033[30mThanks for using our service.\033[0m\n";
 
             break;
