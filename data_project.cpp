@@ -46,6 +46,7 @@ struct userList
 
 void choice(user *, int);
 void access(user *, int);
+void accesschoice(user *,int ,int);
 
 void readfromfile(user *&head)
 {
@@ -93,9 +94,16 @@ void readfromfile(user *&head)
 void print(user *head)
 {
     user *travel = head;
-    while (travel != nullptr)
+    while (travel != NULL)
     {
         cout << travel->userID << setw(20) << travel->fname << setw(20) << travel->lname << endl;
+        account *tmp=travel->acct;
+        while(tmp!=NULL){
+            cout<<tmp->IBAN<<setw(10)<<tmp->accountName<<setw(10)
+            <<tmp->balance<<setw(10)<<tmp->limitDepositPerDay<<setw(10)<<tmp->limitWithdrawPerMonth
+            <<setw(10)<<tmp->balance<<endl;
+            tmp=tmp->next;
+        }
         travel = travel->next;
     }
 }
@@ -240,35 +248,198 @@ user *checklogin(user *head, string first, string last, int ID)
     return NULL;
 }
 
+void IBAN_confirm(account * node,string &IBAN){
+    bool x;
+    account *tmp=node;
+    do{
+        x=true;
+    cout << "\033[1;33m-->Enter the IBAN of the new account: \033[0m";
+    getline(cin,IBAN);
+    while(tmp!=NULL){
+        tmp->IBAN;
+        if(IBAN==tmp->IBAN){
+            cout<< "\033[1;31m--> This account has this IBNA please use a different one:\033[0m";
+            getline(cin,IBAN);
+            x= false;
+        }
+    }
+    }while(x==false);
+    return;
+}
+void account_type(string &type){
+    bool x;
+    string s;
+    do{
+        x=true;
+    cout << "\033[1;33m-->Press 1 if the account is 'international'\n-->Press 2 if the account is 'domiciled'\033[0m\n";
+    getline(cin,s);
+    if(s.length()!=1){
+        cout<< "\033[1;31m--> Invalid choice.\033[0m\n";
+        x=false;
+    }
+    if(s=="1"){
+        type="international";
+    }
+    else if(s=="2"){
+        type="domiciled";
+    }
+    else x=false;
+    }while(x==false);
+    return;
+}
 
-// user *add_new_account(user *node,int size){
-//     string IBAN;
-//     cout << "\033[1;33Enter the IBAN of the new account: \033[0m";
-//    // insted of the getline add a confirmation
-//     getline(cin,IBAN);
+void Deposit_check(double &balance){
+    string blc;
+    bool x;
+    int z,y;
+    do{
+        z=y=0;
+        getline(cin,blc);
+        for(int i=0;i<blc.length();i++){
+            if(blc[i]=='.'){
+                z++;
+            }
+            if(isdigit(blc[i])){
+                y++;
+            }
+        }
+        if((z==1||z==0)&&y>0){
+            x=true;
+        }
+        else x=false;
+        if(x==false){
+            cout<< "\033[1;31m--> Invalid choice.\033[0m\n\033[1;32m-->Enter the correct form:  \033[0m";
+        }
+    }while(x==false);
+    balance=stod(blc);
+    return;
+}
+account * add_account_after_get(account *node,int ID,string IBAN,string currency,string type,double balance,double limitDpD,double limitWPD){
+    account *tmp2=node;
+    account *info=new account;
+    info->next=NULL;
+    info->IBAN=IBAN;
+    info->balance=balance;
+    info->currency=currency;
+    info->limitDepositPerDay=limitDpD;
+    info->limitWithdrawPerMonth;
+    info->accountName=type;
+    if(tmp2==NULL){
+        return info;
+    }
+    else{
+    while(tmp2->next!=NULL){//if its next is null then the tmp2 has data
+        tmp2=tmp2->next;
+    }
+    tmp2->next=info;
+    return node;
+    }
+}
+user * get_account(user *node,int ID,string IBAN,string currency,string type,double balance,double limitDpD,double limitWPD){
+    user *tmp=node;
+    while(tmp!=NULL){
+        if(tmp->userID==ID){
+            tmp->acct=add_account_after_get(tmp->acct,ID,IBAN,currency,type,balance,limitDpD,limitWPD);
+            break;
+        }
+        tmp=tmp->next;   
+    }
+    return node;
+}
 
+
+//chat gpt code
+// account* add_account_after_get(account* node, string IBAN, string currency, string type, 
+//                                double balance, double limitDpD, double limitWPD) {
+//     account* tmp2 = node;
+//     account* info = new account;
+
+//     // Initialize the new account node
+//     info->IBAN = IBAN;
+//     info->balance = balance;
+//     info->currency = currency;
+//     info->limitDepositPerDay = limitDpD;
+//     info->limitWithdrawPerMonth = limitWPD;
+//     info->accountName = type;
+//     info->next = NULL;
+
+//     // If the account list is empty, return the new account node
+//     if (tmp2 == NULL) {
+//         return info;
+//     }
+
+//     // Traverse to the end of the linked list
+//     while (tmp2->next != NULL) {
+//         tmp2 = tmp2->next;
+//     }
+
+//     // Add the new account to the end of the list
+//     tmp2->next = info;
+
+//     return node;
 // }
 
-void accesschoice(user *node,int size){
+// user* get_account(user* node, int ID, string IBAN, string currency, string type, 
+//                   double balance, double limitDpD, double limitWPD) {
+//     user* tmp = node;
+
+//     // Traverse the user linked list
+//     while (tmp != NULL) {
+//         if (tmp->userID == ID) {
+//             // Add the account to the matching user's account list
+//             tmp->acct = add_account_after_get(tmp->acct, IBAN, currency, type, 
+//                                               balance, limitDpD, limitWPD);
+//             break;
+//         }
+//         tmp = tmp->next;
+//     }
+
+//     return node;
+// }
+
+//note this is experimental its still not working
+void add_new_account_input(user *node,int size,int ID){
+    string IBAN,type,currency;
+    double balance,limitDPD,limitWPD;
+    IBAN_confirm(node->acct,IBAN);
+    // getline(cin,IBAN);
+    account_type(type);
+    // getline(cin,type);
+    cout << "\033[1;33mEnter the currency of the new account(example: $): \033[0m";
+    //confirmation sal assaf as for now the currency wont be checked
+    getline(cin,currency);
+    cout << "\033[1;33mEnter the Balance of the new account: \033[0m";
+    Deposit_check(balance);
+    cout << "\033[1;33mEnter the  limit Deposit PerDay of the new account: \033[0m";
+    Deposit_check(limitDPD);
+    cout << "\033[1;33mEnter the  limit Withdraw PerMonth of the new account: \033[0m";
+    Deposit_check(limitWPD);
+    //this function has a problem test it ??-->only inputs one function
+    // node=get_account(node,ID,IBAN,currency,type,balance,limitDPD,limitWPD);
+    accesschoice(node,size,ID);
+    return;
+}
+
+void accesschoice(user *node,int size,int ID){
      char x;
     cout <<endl<< "\033[1;33m--> ~Press 1 to add an account .\n--> ~Press 2 to do a transaction.\n--> ~Press 0 to Return.\033[0m " << endl;
     do
     {
         cin >> x;
-        if (x == '2')
+        if (x == '1')
         {
+            print(node);
             cin.ignore();
-            // AddNewUser(c, size);
+            add_new_account_input(node,size,ID);
         }
-        else if (x == '1')
+        else if (x == '2')
         {
             cin.ignore();
             // access(c, size);
         }
         else if (x == '0')
         {
-            // choice(node,size);
-            return;
+            choice(node,size);
             break;
         }
         else
@@ -312,7 +483,7 @@ void access(user *node, int size)
         checkname(lastname);
         chosen = checklogin(node, firstname, lastname, ID);
     } while (chosen == NULL);
-    accesschoice(chosen,size);
+    accesschoice(chosen,size,ID);
     return ;
 }
 void add_to_txt_file(user *node)
@@ -369,7 +540,7 @@ void choice(user *c, int size)
         {
             print(c);
             add_to_txt_file(c);
-            cout << "\033[30m-->Thanks for using our service.<--\033[0m\n";
+            cout << "\033[30m-->Thanks for using our services<--\033[0m\n";
 
             break;
         }
