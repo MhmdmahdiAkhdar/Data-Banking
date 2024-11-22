@@ -98,12 +98,12 @@ void print(user *head)
     {
         cout << travel->userID << setw(20) << travel->fname << setw(20) << travel->lname << endl;
         account *tmp=travel->acct;
-        while(tmp!=NULL){
-            cout<<tmp->IBAN<<setw(10)<<tmp->accountName<<setw(10)
-            <<tmp->balance<<setw(10)<<tmp->limitDepositPerDay<<setw(10)<<tmp->limitWithdrawPerMonth
-            <<setw(10)<<tmp->balance<<endl;
-            tmp=tmp->next;
-        }
+        // while(tmp!=NULL){
+        //     cout<<tmp->IBAN<<setw(10)<<tmp->accountName<<setw(10)
+        //     <<tmp->balance<<setw(10)<<tmp->limitDepositPerDay<<setw(10)<<tmp->limitWithdrawPerMonth
+        //     <<setw(10)<<tmp->balance<<endl;
+        //     tmp=tmp->next;
+        // }
         travel = travel->next;
     }
 }
@@ -112,7 +112,7 @@ int sizereaderusr()
     fstream file;
     int size = 0;
     string line;
-    file.open("clients.txt", ios::in);
+    file.open("input.txt", ios::in);
     while (getline(file, line))
     {
         size++;
@@ -557,6 +557,7 @@ int main()
     node = NULL;
     readfromfile(node);
     int size = sizereaderusr();
+    cout<<size;
     choice(node, size);
     delete node;
 }
