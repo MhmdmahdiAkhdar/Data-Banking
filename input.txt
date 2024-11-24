@@ -1,5 +1,4 @@
 -1,John,Smith
-#1,1,1$,1,1
-#2,1,1$,1,1
 -2,Alice,Anderson
 -3,Bob,Smith
+-4,man,king

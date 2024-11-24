@@ -58,8 +58,9 @@ void readfromfile(user *&head)
         if (line.empty())
             continue;
 
-        if (line[0] == '-')
+        if (line[0] == '-'){
             line = line.substr(1);
+        //  else continue;
 
         stringstream ss(line);
         string userIDStr, fname, lname;
@@ -72,9 +73,9 @@ void readfromfile(user *&head)
         newUser->userID = stoi(userIDStr);
         newUser->fname = fname;
         newUser->lname = lname;
-        newUser->next = nullptr;
-
-        if (head == nullptr)
+        newUser->next = NULL;
+        newUser->acct=NULL;
+        if (head == NULL)
         {
             head = newUser;
             tail = head;
@@ -84,8 +85,12 @@ void readfromfile(user *&head)
             tail->next = newUser;
             tail = newUser;
         }
-    }
+        }
+        else if(line[0]=='#'){
 
+        }
+
+    }
     input.close();
 }
 
@@ -104,7 +109,7 @@ int sizereaderusr()
     fstream file;
     int size = 0;
     string line;
-    file.open("clients.txt", ios::in);
+    file.open("input.txt", ios::in);
     while (getline(file, line))
     {
         size++;
@@ -139,17 +144,17 @@ user *insertAtEnd(user *head, string first, string last)
     user *tmp = new user; // creates a new pointer
     tmp->fname = first;
     tmp->lname = last;
-    tmp->next = nullptr; // in the last node the next is allways null
-
-    if (head == nullptr)
+    tmp->next = NULL; // in the last node the next is allways null
+    tmp->acct =NULL;
+    if (head == NULL)
     {                    // if there is no other pointers
         tmp->userID = 1; // Assign first user ID
-        tmp->previous = nullptr;
+        tmp->previous = NULL;
         return tmp; // New head
     }
 
     user *cur = head;
-    while (cur->next != nullptr)
+    while (cur->next != NULL)
     {
         cur = cur->next; // Traverse to the end of the list
     }
@@ -157,7 +162,7 @@ user *insertAtEnd(user *head, string first, string last)
     cur->next = tmp;               // Link the new node
     tmp->previous = cur;           // Set the previous pointer
     tmp->userID = cur->userID + 1; // Increment user ID
-    return head;                   // Return the head of the list
+    return head;             // Return the head of the list
 }
 bool repetion(user *head, string first, string last)
 {
@@ -259,6 +264,7 @@ void accesschoice(user *node,int size){
         {
             cin.ignore();
             // AddNewUser(c, size);
+
         }
         else if (x == '1')
         {

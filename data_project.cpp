@@ -50,6 +50,8 @@ void choice(user *, int);
 void access(user *, int);
 void accesschoice(user *,int ,int);
 void print(user *);
+
+
 void readfromfile(user *&head)
 {
     ifstream input;
@@ -63,7 +65,6 @@ void readfromfile(user *&head)
     user *tail = nullptr;
     while (getline(input, line))
     {
-        // Handle user records starting with '-'
         if (line[0] == '-')
         {
             line = line.substr(1);
@@ -114,7 +115,7 @@ void readfromfile(user *&head)
             newAccount->IBAN = IBAN;
             newAccount->accountName = accountName;
             newAccount->balance = stod(bal);
-            newAccount->currency = cur;
+            // newAccount->currency = cur;
             newAccount->limitDepositPerDay = stod(LDP);
             newAccount->limitWithdrawPerMonth = stod(LWM);
             newAccount->txn = nullptr;
