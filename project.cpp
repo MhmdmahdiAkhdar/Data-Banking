@@ -46,9 +46,9 @@ struct userList
 
 void choice(user *, int);
 void access(user *, int);
-void accesschoice(user *,int ,int );
+void accesschoice(user *, int, int);
 void print(user *);
-user*  readfromfile(user *&head)
+user *readfromfile(user *&head)
 {
     ifstream input;
     input.open("input.txt", ios::in);
@@ -59,48 +59,50 @@ user*  readfromfile(user *&head)
         if (line.empty())
             continue;
 
-        if (line[0] == '-'){
-            line = line.substr(1);
-        //  else continue;
-
-        stringstream ss(line);
-        string userIDStr, fname, lname;
-
-        getline(ss, userIDStr, ',');
-        getline(ss, fname, ',');
-        getline(ss, lname, ',');
-
-        user *newUser = new user;
-        newUser->userID = stoi(userIDStr);
-        newUser->fname = fname;
-        newUser->lname = lname;
-        newUser->next = NULL;
-        newUser->acct=NULL;
-        if (head == NULL)
+        if (line[0] == '-')
         {
-            head = newUser;
-            tail = head;
-        }
-        else
-        {
-            tail->next = newUser;
-            tail = newUser;
-        }
-        // tail->acct=NULL;
-        }
-        else if(line[0]=='#'){
             line = line.substr(1);
-             stringstream ss(line);
-             string IBAN,accName,currency,balandcur ,limitPD,limitPM,balance;
+            //  else continue;
+
+            stringstream ss(line);
+            string userIDStr, fname, lname;
+
+            getline(ss, userIDStr, ',');
+            getline(ss, fname, ',');
+            getline(ss, lname, ',');
+
+            user *newUser = new user;
+            newUser->userID = stoi(userIDStr);
+            newUser->fname = fname;
+            newUser->lname = lname;
+            newUser->next = NULL;
+            newUser->acct = NULL;
+            if (head == NULL)
+            {
+                head = newUser;
+                tail = head;
+            }
+            else
+            {
+                tail->next = newUser;
+                tail = newUser;
+            }
+            // tail->acct=NULL;
+        }
+        else if (line[0] == '#')
+        {
+            line = line.substr(1);
+            stringstream ss(line);
+            string IBAN, accName, currency, balandcur, limitPD, limitPM, balance;
             getline(ss, IBAN, ',');
             getline(ss, accName, ',');
             getline(ss, balandcur, ',');
             getline(ss, limitPD, ',');
             getline(ss, limitPM, ',');
-            //this function is in the string library that finds the first non present element and return its position
-            int pos=balandcur.find_first_not_of("0123456789.");
-            balance=balandcur.substr(0,pos);
-            currency=balandcur.substr(pos);
+            // this function is in the string library that finds the first non present element and return its position
+            int pos = balandcur.find_first_not_of("0123456789.");
+            balance = balandcur.substr(0, pos);
+            currency = balandcur.substr(pos);
             account *newAccount = new account;
             newAccount->IBAN = IBAN;
             newAccount->accountName = accName;
@@ -110,19 +112,21 @@ user*  readfromfile(user *&head)
             newAccount->limitWithdrawPerMonth = stod(limitPM);
             newAccount->txn = NULL;
             newAccount->next = NULL;
-            account *tmp=tail->acct;
-            if(tmp==NULL){
-                tmp=newAccount;
-                tail->acct=newAccount;
+            account *tmp = tail->acct;
+            if (tmp == NULL)
+            {
+                tmp = newAccount;
+                tail->acct = newAccount;
             }
-            else{
-                while(tmp->next!=NULL){
-                    tmp=tmp->next;
+            else
+            {
+                while (tmp->next != NULL)
+                {
+                    tmp = tmp->next;
                 }
-                tmp->next=newAccount;
+                tmp->next = newAccount;
             }
         }
-
     }
     input.close();
     // print(head);
@@ -139,19 +143,20 @@ user*  readfromfile(user *&head)
 }
 
 // prints every thing this may be deleted later on
-void  print(user *head)
+void print(user *head)
 {
     user *travel = head;
     while (travel != NULL)
     {
-        cout <<"-"<< travel->userID << setw(20) << travel->fname << setw(20) << travel->lname << endl;
-       while(travel->acct!=NULL){
-            cout<<"#"<<travel->acct->IBAN<<","<<travel->acct->accountName<<","<<travel->acct->balance<<travel->acct->currency<<","<<travel->acct->limitDepositPerDay<<","<<travel->acct->limitWithdrawPerMonth<<endl;
-            travel->acct=travel->acct->next;
+        cout << "-" << travel->userID << setw(20) << travel->fname << setw(20) << travel->lname << endl;
+        while (travel->acct != NULL)
+        {
+            cout << "#" << travel->acct->IBAN << "," << travel->acct->accountName << "," << travel->acct->balance << travel->acct->currency << "," << travel->acct->limitDepositPerDay << "," << travel->acct->limitWithdrawPerMonth << endl;
+            travel->acct = travel->acct->next;
         }
         travel = travel->next;
     }
-    return ;
+    return;
 }
 int sizereaderusr()
 {
@@ -161,9 +166,10 @@ int sizereaderusr()
     file.open("input.txt", ios::in);
     while (getline(file, line))
     {
-        if(line[0] =='-'){
+        if (line[0] == '-')
+        {
 
-        size++;
+            size++;
         }
     }
     file.close();
@@ -197,7 +203,7 @@ user *insertAtEnd(user *head, string first, string last)
     tmp->fname = first;
     tmp->lname = last;
     tmp->next = NULL; // in the last node the next is allways null
-    tmp->acct =NULL;
+    tmp->acct = NULL;
     if (head == NULL)
     {                    // if there is no other pointers
         tmp->userID = 1; // Assign first user ID
@@ -214,7 +220,7 @@ user *insertAtEnd(user *head, string first, string last)
     cur->next = tmp;               // Link the new node
     tmp->previous = cur;           // Set the previous pointer
     tmp->userID = cur->userID + 1; // Increment user ID
-    return head;             // Return the head of the list
+    return head;                   // Return the head of the list
 }
 bool repetion(user *head, string first, string last)
 {
@@ -290,120 +296,168 @@ user *checklogin(user *head, string first, string last, int ID)
         {
             return travel;
         }
-        travel->previous=travel;
+        travel->previous = travel;
         travel = travel->next;
     }
     cout << "\033[1;31m--> There is no account with this information.\033[0m\n";
     return NULL;
 }
-void account_type(string &type){
+void account_type(string &type)
+{
     bool x;
     string s;
-    do{
-        x=true;
-    cout << "\033[1;33m-->Press 1 if the account is 'international'\n-->Press 2 if the account is 'domiciled'\033[0m\n";
-    getline(cin,s);
-    if(s.length()!=1){
-        cout<< "\033[1;31m--> Invalid choice.\033[0m\n";
-        x=false;
-    }
-    if(s=="1"){
-        type="international";
-    }
-    else if(s=="2"){
-        type="domiciled";
-    }
-    else x=false;
-    }while(x==false);
+    do
+    {
+        x = true;
+        cout << "\033[1;33m-->Press 1 if the account is 'international'\n-->Press 2 if the account is 'domiciled'\033[0m\n";
+        getline(cin, s);
+        if (s.length() != 1)
+        {
+            cout << "\033[1;31m--> Invalid choice.\033[0m\n";
+            x = false;
+        }
+        if (s == "1")
+        {
+            type = "international";
+        }
+        else if (s == "2")
+        {
+            type = "domiciled";
+        }
+        else
+            x = false;
+    } while (x == false);
     return;
 }
-void currency_get(string &currency){
-    do{
-    cout << "\033[1;33mEnter the currency of the new account(example: $): \033[0m";
-    getline(cin, currency);
-        if(currency!="L.L."&&currency!="$"&&currency!="€"){
-            cout<< "\033[1;31m--> Invalid choice.\033[0m\n";
+void currency_get(string &currency)
+{
+    do
+    {
+        cout << "\033[1;33mEnter the currency of the new account( $/ L.L/press 1 for euro): \033[0m";
+        getline(cin, currency);
+        if (currency != "L.L." && currency != "$" && currency != "1")
+        {
+            cout << "\033[1;31m--> Invalid choice.\033[0m\n";
         }
         // € is not working?
-    }while(currency!="L.L."&&currency!="$"&&currency!="€");
+    } while (currency != "L.L." && currency != "$" && currency != "1");
+    if (currency == "1")
+        currency = "euro";
 }
-void Deposit_check(double &balance){
+void Deposit_check(double &balance)
+{
     string blc;
     bool x;
-    int z,y;
-    do{
-        z=y=0;
-        getline(cin,blc);
-        for(int i=0;i<blc.length();i++){
-            if(blc[i]=='.'){
+    int z, y;
+    do
+    {
+        z = y = 0;
+        getline(cin, blc);
+        for (int i = 0; i < blc.length(); i++)
+        {
+            if (blc[i] == '.')
+            {
                 z++;
             }
-            if(isdigit(blc[i])){
+            if (!isdigit(blc[i]) && blc[i] != '.')
+            {
                 y++;
             }
         }
-        if((z==1||z==0)&&y>0){
-            x=true;
+        for (char c : blc)
+        {
+            if (!isdigit(c))
+            {
+                y++;
+                break;
+            }
+            if ((z == 1 || z == 0) && y == 0)
+            {
+                x = true;
+            }
+            else
+                x = false;
         }
-        else x=false;
-        if(x==false){
-            cout<< "\033[1;31m--> Invalid choice.\033[0m\n\033[1;32m-->Enter the correct form:  \033[0m";
+        if (x == false)
+        {
+            cout << "\033[1;31m--> Invalid choice.\033[0m\n\033[1;32m-->Enter the correct form:  \033[0m";
         }
-    }while(x==false);
-    balance=stod(blc);
+    } while (x == false);
+    balance = stod(blc);
     return;
 }
-void  IBAN_confirm(user *tmp,string &IBAN){
-    bool isUnique;
-    do {
-        isUnique=true;
+void IBAN_confirm(user *tmp, string &IBAN)
+{
+    bool isUnique, x;
+    do
+    {
+        isUnique = true;
         cout << "\033[1;33m--> Enter the IBAN of the new account: \033[0m";
         getline(cin, IBAN);
-        account * tmpacc=tmp->acct;
-        while (tmpacc != NULL) {
-                if (IBAN == tmpacc->IBAN) {
-                    cout << "\033[1;31m--> This IBAN already exists, please enter a different one:\n \033[0m";
-                    isUnique = false;
-                    break;
-                }
-            tmpacc=tmpacc->next;
+        account *tmpacc = tmp->acct;
+        while (tmpacc != NULL)
+        {
+            if (IBAN == tmpacc->IBAN)
+            {
+                cout << "\033[1;31m--> This IBAN already exists, please enter a different one:\n \033[0m";
+                isUnique = false;
+                break;
+            }
+            tmpacc = tmpacc->next;
         }
-    }while (!isUnique);
-    return ;
+        for (char c : IBAN)
+        {
+            if (!isdigit(c))
+            {
+                cout << "\033[1;31m--> You can enter only numbers.\n \033[0m";
+                x = false;
+                break;
+            }
+            else
+                x = true;
+        }
+    } while (!isUnique || x == false);
+    return;
 }
 
-account * add_new_account_input(account * tmpaccounts,string IBAN,string type,string currency,double balance,double limitDPD,double limitWPM){
-    account * tmp=tmpaccounts;
-    account *newAccount= new account;
-    newAccount->IBAN=IBAN;
-    newAccount->accountName=type;
-    newAccount->currency=currency;
-    newAccount->balance=balance;
-    newAccount->limitDepositPerDay=limitDPD;
-    newAccount->limitWithdrawPerMonth=limitWPM;
-    newAccount->txn=NULL;
-    newAccount->next=NULL;
-    if(tmp==NULL){
-        return newAccount ;
-    }else{
-        while(tmp->next!=NULL){
-            tmp=tmp->next;
+account *add_new_account_input(account *tmpaccounts, string IBAN, string type, string currency, double balance, double limitDPD, double limitWPM)
+{
+    account *tmp = tmpaccounts;
+    account *newAccount = new account;
+    newAccount->IBAN = IBAN;
+    newAccount->accountName = type;
+    newAccount->currency = currency;
+    newAccount->balance = balance;
+    newAccount->limitDepositPerDay = limitDPD;
+    newAccount->limitWithdrawPerMonth = limitWPM;
+    newAccount->txn = NULL;
+    newAccount->next = NULL;
+    if (tmp == NULL)
+    {
+        return newAccount;
+    }
+    else
+    {
+        while (tmp->next != NULL)
+        {
+            tmp = tmp->next;
         }
-        tmp->next=newAccount;
-    return tmpaccounts;
+        tmp->next = newAccount;
+        return tmpaccounts;
     }
 }
 
-void add_new_account(user *node,int size,int ID){
-    user *tmp=node;
-    while(tmp->userID!=ID&&tmp!=NULL){
-        tmp->previous=tmp;
-        tmp=tmp->next;
+void add_new_account(user *node, int size, int ID)
+{
+    user *tmp = node;
+    while (tmp->userID != ID && tmp != NULL)
+    {
+        tmp->previous = tmp;
+        tmp = tmp->next;
     }
     string IBAN, type, currency;
     double balance, limitDPD, limitWPM;
     IBAN_confirm(tmp, IBAN);
-    cout<<"wds";
     account_type(type);
     currency_get(currency);
     cout << "\033[1;33mEnter the Balance of the new account: \033[0m";
@@ -412,21 +466,23 @@ void add_new_account(user *node,int size,int ID){
     Deposit_check(limitDPD);
     cout << "\033[1;33mEnter the limit Withdraw PerMonth of the new account: \033[0m";
     Deposit_check(limitWPM);
-    tmp->acct=add_new_account_input(tmp->acct,IBAN,type,currency,balance,limitDPD,limitWPM);
-    accesschoice(node,size,ID);
-    return ;
+    tmp->acct = add_new_account_input(tmp->acct, IBAN, type, currency, balance, limitDPD, limitWPM);
+    accesschoice(node, size, ID);
+    return;
 }
 
-void accesschoice(user *node,int size,int ID){
-     char x;
-    cout <<endl<< "\033[1;33m--> ~Press 1 to add a User .\n--> ~Press 2 to do a transaction.\n--> ~Press 0 to Return.\033[0m " << endl;
+void accesschoice(user *node, int size, int ID)
+{
+    char x;
+    cout << endl
+         << "\033[1;33m--> ~Press 1 to add a User .\n--> ~Press 2 to do a transaction.\n--> ~Press 0 to Return.\033[0m " << endl;
     do
     {
         cin >> x;
         if (x == '1')
         {
             cin.ignore();
-           add_new_account(node,size,ID);
+            add_new_account(node, size, ID);
         }
         else if (x == '2')
         {
@@ -435,13 +491,13 @@ void accesschoice(user *node,int size,int ID){
         }
         else if (x == '0')
         {
-            choice(node,size);
+            choice(node, size);
             return;
             break;
         }
         else
         {
-            cout<< "\033[1;31m--> Invalid choice.\033[0m\n";
+            cout << "\033[1;31m--> Invalid choice.\033[0m\n";
         }
     } while (x != '1' && x != '2' && x != '0');
     return;
@@ -451,20 +507,22 @@ void ID_checker(int &ID)
 {
     string id;
     bool x;
-    do{
-    cout << "\033[1;33m-->Enter your ID: \033[0m";
-    getline(cin,id);
-    for (char c : id)
+    do
+    {
+        cout << "\033[1;33m-->Enter your ID: \033[0m";
+        getline(cin, id);
+        for (char c : id)
         {
             if (!isdigit(c))
             {
                 x = false;
                 break;
             }
-            else x= true;
+            else
+                x = true;
         }
-    }while(x==false);
-    ID=stoi(id);
+    } while (x == false);
+    ID = stoi(id);
 }
 void access(user *node, int size)
 {
@@ -480,8 +538,8 @@ void access(user *node, int size)
         checkname(lastname);
         chosen = checklogin(node, firstname, lastname, ID);
     } while (chosen == NULL);
-    accesschoice(node,size,ID);
-    return ;
+    accesschoice(node, size, ID);
+    return;
 }
 void add_to_txt_file(user *node)
 {
@@ -503,10 +561,12 @@ void add_to_txt_file(user *node)
                   << "-" << travel->userID << "," << travel->fname << "," << travel->lname;
         }
 
-        account *tmp2=travel->acct;
-        while(tmp2 != NULL){
-            input<<endl<<"#"<<tmp2->IBAN<<","<<tmp2->accountName<<","<<tmp2->balance<<tmp2->currency<<","<<tmp2->limitDepositPerDay<<","<<tmp2->limitWithdrawPerMonth;
-            tmp2=tmp2->next;
+        account *tmp2 = travel->acct;
+        while (tmp2 != NULL)
+        {
+            input << endl
+                  << "#" << tmp2->IBAN << "," << tmp2->accountName << "," << tmp2->balance << tmp2->currency << "," << tmp2->limitDepositPerDay << "," << tmp2->limitWithdrawPerMonth;
+            tmp2 = tmp2->next;
         }
         travel = travel->next;
     }
@@ -549,7 +609,7 @@ int main()
 {
     user *node = new user;
     node = NULL;
-    node=readfromfile(node);
+    node = readfromfile(node);
     int size = sizereaderusr();
     choice(node, size);
     print(node);
