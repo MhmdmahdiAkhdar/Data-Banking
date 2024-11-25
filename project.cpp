@@ -333,7 +333,7 @@ void currency_get(string &currency)
 {
     do
     {
-        cout << "\033[1;33mEnter the currency of the new account( $/ L.L/press 1 for euro): \033[0m";
+        cout << "\033[1;33mEnter the currency of the new account( $/ L.L/press 1 for \u20AC): \033[0m";
         getline(cin, currency);
         if (currency != "L.L." && currency != "$" && currency != "1")
         {
@@ -342,7 +342,7 @@ void currency_get(string &currency)
         // € is not working?
     } while (currency != "L.L." && currency != "$" && currency != "1");
     if (currency == "1")
-        currency = "euro";
+        currency = "\u20AC";
 }
 void Deposit_check(double &balance)
 {
