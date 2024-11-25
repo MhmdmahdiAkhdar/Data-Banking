@@ -4,6 +4,7 @@
 #include <fstream>
 #include <cstring>
 #include <cctype>
+#include<cmath>
 #include <iomanip>
 // #include <ctime>
 // #include <chrono>
@@ -93,16 +94,21 @@ user *readfromfile(user *&head)
         {
             line = line.substr(1);
             stringstream ss(line);
-            string IBAN, accName, currency, balandcur, limitPD, limitPM, balance;
+            string IBAN, accName, currency, balandcur, limitPD , limitPDandcurr , limitPM , limitPMandcurr , balance;
             getline(ss, IBAN, ',');
             getline(ss, accName, ',');
             getline(ss, balandcur, ',');
-            getline(ss, limitPD, ',');
-            getline(ss, limitPM, ',');
+            getline(ss, limitPDandcurr, ',');
+            getline(ss, limitPMandcurr, ',');
             // this function is in the string library that finds the first non present element and return its position
             int pos = balandcur.find_first_not_of("0123456789.");
             balance = balandcur.substr(0, pos);
             currency = balandcur.substr(pos);
+            pos = limitPDandcurr.find_first_not_of("0123456789.");
+            limitPD = limitPDandcurr.substr(0, pos);
+            pos = limitPMandcurr.find_first_not_of("0123456789.");
+            limitPM = limitPMandcurr.substr(0, pos);
+
             account *newAccount = new account;
             newAccount->IBAN = IBAN;
             newAccount->accountName = accName;
@@ -112,6 +118,7 @@ user *readfromfile(user *&head)
             newAccount->limitWithdrawPerMonth = stod(limitPM);
             newAccount->txn = NULL;
             newAccount->next = NULL;
+            cout<<newAccount->balance<<endl;
             account *tmp = tail->acct;
             if (tmp == NULL)
             {
@@ -129,16 +136,6 @@ user *readfromfile(user *&head)
         }
     }
     input.close();
-    // print(head);
-    // cout<<"hwllo"<<endl;
-    // print(head);
-    // cout<<"hwllo"<<endl;
-    // print(head);
-    // cout<<"hwllo"<<endl;
-    // print(head);
-    // cout<<"hwllo"<<endl;
-    // print(head);
-    // cout<<"hwllo"<<endl;
     return head;
 }
 
@@ -565,7 +562,7 @@ void add_to_txt_file(user *node)
         while (tmp2 != NULL)
         {
             input << endl
-                  << "#" << tmp2->IBAN << "," << tmp2->accountName << "," << tmp2->balance << tmp2->currency << "," << tmp2->limitDepositPerDay << "," << tmp2->limitWithdrawPerMonth;
+                  << "#" << tmp2->IBAN << "," << tmp2->accountName << "," << tmp2->balance << tmp2->currency << "," << tmp2->limitDepositPerDay<< tmp2->currency << "," << tmp2->limitWithdrawPerMonth<< tmp2->currency;
             tmp2 = tmp2->next;
         }
         travel = travel->next;
@@ -609,10 +606,10 @@ int main()
 {
     user *node = new user;
     node = NULL;
-    //in the input to file must add the cur in all the numbers involved and fix the read from txt file (make it just like the balance)
     node = readfromfile(node);
     int size = sizereaderusr();
     choice(node, size);
+    //the print function is changing the format after it prints so it the lists wont work after entering it be care full change it later also fix the setw() in it so it can calculat the length
     print(node);
     delete node;
 }
