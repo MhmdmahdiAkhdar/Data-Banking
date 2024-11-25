@@ -335,12 +335,12 @@ void currency_get(string &currency)
     {
         cout << "\033[1;33mEnter the currency of the new account( $/ L.L/press 1 for \u20AC): \033[0m";
         getline(cin, currency);
-        if (currency != "L.L." && currency != "$" && currency != "1")
+        if (currency != "L.L" && currency != "$" && currency != "1")
         {
             cout << "\033[1;31m--> Invalid choice.\033[0m\n";
         }
         // € is not working?
-    } while (currency != "L.L." && currency != "$" && currency != "1");
+    } while (currency != "L.L" && currency != "$" && currency != "1");
     if (currency == "1")
         currency = "\u20AC";
 }
@@ -405,18 +405,18 @@ void IBAN_confirm(user *tmp, string &IBAN)
             }
             tmpacc = tmpacc->next;
         }
-        for (char c : IBAN)
-        {
-            if (!isdigit(c))
-            {
-                cout << "\033[1;31m--> You can enter only numbers.\n \033[0m";
-                x = false;
-                break;
-            }
-            else
-                x = true;
-        }
-    } while (!isUnique || x == false);
+        // for (char c : IBAN)
+        // {
+        //     if (!isdigit(c))
+        //     {
+        //         cout << "\033[1;31m--> You can enter only numbers.\n \033[0m";
+        //         x = false;
+        //         break;
+        //     }
+        //     else
+        //         x = true;
+        // }
+    } while (!isUnique );
     return;
 }
 
@@ -609,6 +609,7 @@ int main()
 {
     user *node = new user;
     node = NULL;
+    //in the input to file must add the cur in all the numbers involved and fix the read from txt file (make it just like the balance)
     node = readfromfile(node);
     int size = sizereaderusr();
     choice(node, size);

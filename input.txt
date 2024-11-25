@@ -1,12 +1,7 @@
 -1,John,Smith
-#10,international,50L.L.,190,300
-#195,domiciled,999$,999,0
+#L001,international,5000$,1000,2000
+#L002,domiciled,2e+06L.L,500000,100000
 -2,Alice,Anderson
-#1,international,1$,1,1
+#B002,international,3000€,500,1000
 -3,Bob,Smith
-#654,international,1$,1,1
-#1,international,33$,1,3
-#5,international,1$,1,1
 -4,ahmad,assaf
-#2314,international,3500$,500,1500
-#443,international,6000$,5656,45678
