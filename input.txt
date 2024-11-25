@@ -1,4 +1,9 @@
 -1,John,Smith
+#10,international,50L.L.,190,300
+#195,domiciled,999$,999,0
 -2,Alice,Anderson
+#1,international,1$,1,1
 -3,Bob,Smith
--4,man,king
+#654,international,1$,1,1
+#1,international,33$,1,3
+#5,international,1$,1,1
