@@ -4,6 +4,3 @@
 -2,Alice,Anderson
 #B002,international,3000€,500€,1000€
 -3,Bob,Smith
--4,ahmad,assaf
-#1,international,1000L.L,1000L.L,2000L.L
-#S400,international,2e+33$,2e+33$,3e+33$

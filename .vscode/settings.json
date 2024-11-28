@@ -58,5 +58,8 @@
         "variant": "cpp",
         "xstring": "cpp",
         "xiosbase": "cpp"
-    }
+    },
+    "cSpell.ignoreWords": [
+        "sizereaderusr"
+    ]
 }

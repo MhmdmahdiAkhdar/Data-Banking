@@ -444,7 +444,7 @@ account *add_new_account_input(account *tmpaccounts, string IBAN, string type, s
     }
 }
 
-void add_new_account(user *node, int size, int ID)
+void add_new_User(user *node, int size, int ID)
 {
     user *tmp = node;
     while (tmp->userID != ID && tmp != NULL)
@@ -468,18 +468,22 @@ void add_new_account(user *node, int size, int ID)
     return;
 }
 
+void access_transaction(){
+
+}
+
 void accesschoice(user *node, int size, int ID)
 {
     char x;
     cout << endl
-         << "\033[1;33m--> ~Press 1 to add a User .\n--> ~Press 2 to do a transaction.\n--> ~Press 0 to Return.\033[0m " << endl;
+         << "\033[1;33m--> ~Press 1 to add a User .\n--> ~Press 2 to access the transaction menu.\n--> ~Press 0 to Return.\033[0m " << endl;
     do
     {
         cin >> x;
         if (x == '1')
         {
             cin.ignore();
-            add_new_account(node, size, ID);
+            add_new_User(node, size, ID);
         }
         else if (x == '2')
         {
@@ -563,6 +567,12 @@ void add_to_txt_file(user *node)
         {
             input << endl
                   << "#" << tmp2->IBAN << "," << tmp2->accountName << "," << tmp2->balance << tmp2->currency << "," << tmp2->limitDepositPerDay<< tmp2->currency << "," << tmp2->limitWithdrawPerMonth<< tmp2->currency;
+         
+            transaction *tmp3=tmp2->txn;
+            while(tmp3!=NULL){
+                input<<endl<<"*"<<tmp3->date<<","<<tmp3->amount;
+                tmp3=tmp3->next;
+            }
             tmp2 = tmp2->next;
         }
         travel = travel->next;
@@ -575,7 +585,7 @@ void choice(user *c, int size)
 {
     // print(c);
     char x;
-    cout << "\033[1;33m--> ~Press 1 to access a user.\n--> ~Press 2 to add a account.\n--> ~Press 0 to exit.\033[0m " << endl;
+    cout << "\033[1;33m--> ~Press 1 to access a account.\n--> ~Press 2 to add a account.\n--> ~Press 0 to exit.\033[0m " << endl;
     do
     {
         cin >> x;
@@ -604,6 +614,8 @@ void choice(user *c, int size)
 }
 int main()
 {
+    userList* nodes=new userList;
+    nodes->head=NULL;
     user *node = new user;
     node = NULL;
     node = readfromfile(node);
