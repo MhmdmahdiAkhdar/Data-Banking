@@ -52,8 +52,9 @@ void choice(userList *, int);
 void access(userList *list, int size);
 void accesschoice(userList *list, int size, int ID);
 void print(userList*);
+void access_transaction(userList *,int);
 
-
+//the function read from file is done and tested every thing is working fine including the transactions
 userList* readFromFile(userList* list) {
     
     fstream input("input.txt",ios::in);
@@ -141,7 +142,6 @@ userList* readFromFile(userList* list) {
             line = line.substr(1);
             stringstream ss(line);
             string date, amountStr;
-            
             getline(ss, date, ',');
             getline(ss, amountStr);
 
@@ -477,15 +477,11 @@ void add_new_User(userList *list, int size, int ID)
     return;
 }
 
-// void access_transaction(){
-
-// }
-
 void accesschoice(userList *list, int size, int ID)
 {
     char x;
     cout << endl
-         << "\033[1;33m--> ~Press 1 to add a User .\n--> ~Press 2 to access the transaction menu.\n--> ~Press 0 to Return.\033[0m " << endl;
+         << "\033[1;33m--> ~Press 1 to add a User .\n--> ~Press 2 to delete a User(this function is not available yet and may not be available due to limited time).\n--> ~Press 0 to Return.\033[0m " << endl;
     do
     {
         cin >> x;
@@ -494,11 +490,11 @@ void accesschoice(userList *list, int size, int ID)
             cin.ignore();
             add_new_User(list, size, ID);
         }
-        else if (x == '2')
-        {
-            cin.ignore();
-            // access_transaction();
-        }
+        // else if (x == '2')
+        // {
+        //  this function is not available yet and may not be available due to limited time where it should have been a function to delete a user
+        //     cin.ignore();
+        // }
         else if (x == '0')
         {
             choice(list, size);
@@ -550,6 +546,8 @@ void access(userList *list, int size)
     accesschoice(list, size, ID);
     return;
 }
+
+//this function is done but not tested for the transaction function
 void add_to_txt_file(userList *list) {
     fstream input;
     user *travel = list->head;
@@ -584,6 +582,35 @@ void add_to_txt_file(userList *list) {
     input.close();
     return;
 }
+void access_transaction(userList *list,int size){
+    char x;
+    cout << endl
+         << "\033[1;33m--> ~Press 1 to start a transaction btween 2 users .\n--> ~Press 2 to access the transaction menu.\n--> ~Press 0 to Return.\033[0m " << endl;
+    do
+    {
+        cin >> x;
+        if (x == '1')
+        {
+            cin.ignore();
+            // add_new_User(list, size, ID);
+        }
+        else if (x == '2')
+        {
+            cin.ignore();
+            // access_transaction(list,size,ID);
+        }
+        else if (x == '0')
+        {
+            choice(list, size);
+            return;
+        }
+        else
+        {
+            cout << "\033[1;31m--> Invalid choice.\033[0m\n";
+        }
+    } while (x != '1' && x != '2' && x != '0');
+    return;
+}
 
 void choice(userList *c, int size)
 {
@@ -602,6 +629,11 @@ void choice(userList *c, int size)
         {
             cin.ignore();
             access(c, size);
+        }
+        else if (x == '3')
+        {
+            cin.ignore();
+            access_transaction(c,size);
         }
         else if (x == '0')
         {
