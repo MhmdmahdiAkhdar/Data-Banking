@@ -585,19 +585,23 @@ void add_to_txt_file(userList *list) {
 void access_transaction(userList *list,int size){
     char x;
     cout << endl
-         << "\033[1;33m--> ~Press 1 to start a transaction btween 2 users .\n--> ~Press 2 to access the transaction menu.\n--> ~Press 0 to Return.\033[0m " << endl;
+         << "\033[1;33m--> ~Press 1 to start a transaction btween 2 users .\n--> ~Press 2 to delete transactions before a certain date .\n--> ~Press 0 to Return.\033[0m " << endl;
     do
     {
         cin >> x;
         if (x == '1')
         {
             cin.ignore();
-            // add_new_User(list, size, ID);
+            //this function should take 2 accounts the transfer amount and the date
+            // a. The amount should be greater than the balance of the account 
+            // b. You need to do a conversion if the accounts do not have the same currency.  
+            // c. Store the operations (deposit and withdraw) in the Transaction Singly list 
+            // d. Check the withdraw and deposit limits before transferring the amount
         }
         else if (x == '2')
         {
             cin.ignore();
-            // access_transaction(list,size,ID);
+            // delete_transactions(list,date);
         }
         else if (x == '0')
         {
@@ -616,7 +620,7 @@ void choice(userList *c, int size)
 {
     // print(c);
     char x;
-    cout << "\033[1;33m--> ~Press 1 to access a account.\n--> ~Press 2 to add a account.\n--> ~Press 0 to exit.\033[0m " << endl;
+    cout << "\033[1;33m--> ~Press 1 to access a account.\n--> ~Press 2 to add a account.\n--> ~Press 3 to access the transaction menu.\n--> ~Press 0 to exit.\033[0m " << endl;
     do
     {
         cin >> x;
@@ -644,17 +648,20 @@ void choice(userList *c, int size)
         {
             cout << "\033[1;31m--> Invalid choice.\033[0m\n";
         }
-    } while (x != '1' && x != '2' && x != '0');
+    } while (x != '1' && x != '2' && x!='3' && x != '0');
     return;
 }
 int main()
 {   
+    SetConsoleCP(CP_UTF8);
+    SetConsoleOutputCP(CP_UTF8);  // Set console to UTF-8
     userList* list=new userList;
     list->head=NULL;
     list->tail=NULL;
     list = readFromFile(list);
     int size = sizereaderusr();
     choice(list, size);
+    // sorting(list);
     //the print function is changing the format after it prints so it the lists wont work after entering it be care full change it later also fix the setw() in it so it can calculat the length
     print(list);
     delete list;
