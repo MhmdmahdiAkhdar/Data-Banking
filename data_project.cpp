@@ -51,6 +51,7 @@ void access(userList *list, int size);
 void accesschoice(userList *list, int size, int ID);
 void print(userList *);
 void access_transaction(userList *, int);
+void transaction_access_2_accounts(userList *, int );
 
 // the function read from file is done and tested every thing is working fine including the transactions
 userList *readFromFile(userList *list)
@@ -119,12 +120,12 @@ userList *readFromFile(userList *list)
 
             int pos = balanceStr.find_first_not_of("0123456789.");
 
-            balance = stod(balanceStr.substr(0, pos));
+            balance = stold(balanceStr.substr(0, pos));
             currency = balanceStr.substr(pos);
             pos = limitDStr.find_first_not_of("0123456789.");
-            limitD = stod(limitDStr.substr(0, pos));
+            limitD = stold(limitDStr.substr(0, pos));
             pos = limitWStr.find_first_not_of("0123456789.");
-            limitW = stod(limitWStr.substr(0, pos));
+            limitW = stold(limitWStr.substr(0, pos));
 
             newAccount->balance = balance;
             newAccount->currency = currency;
@@ -159,7 +160,7 @@ userList *readFromFile(userList *list)
 
             int pos = amountStr.find_first_not_of("0123456789.-");
 
-            newTransaction->amount = stod(amountStr.substr(0, pos));
+            newTransaction->amount = stold(amountStr.substr(0, pos));
             newTransaction->next = NULL;
 
             if (currentAccount->txn == NULL)
@@ -396,42 +397,33 @@ void currency_get(string &currency)
     if (currency == "1")
         currency = "\u20AC";
 }
-void Deposit_check(double &balance)
-{
+void Deposit_check(double &balance) {
     string blc;
     bool x;
     int z, y;
-    do
-    {
+    do {
         z = y = 0;
         getline(cin, blc);
-        for (int i = 0; i < blc.length(); i++)
-        {
-            if (blc[i] == '.')
-            {
+        for (int i = 0; i < blc.length(); i++) {
+            if (blc[i] == '.') {
                 z++;
             }
-            if (!isdigit(blc[i]) && blc[i] != '.')
-            {
+            if (!isdigit(blc[i]) && blc[i] != '.') {
                 y++;
             }
         }
-        for (char c : blc)
-        {
-            if (!isdigit(c))
-            {
+        for (char c : blc) {
+            if (!isdigit(c)) {
                 y++;
                 break;
             }
-            if ((z == 1 || z == 0) && y == 0)
-            {
+            if ((z == 1 || z == 0) && y == 0) {
                 x = true;
-            }
-            else
+            } else {
                 x = false;
+            }
         }
-        if (x == false)
-        {
+        if (x == false) {
             cout << "\033[1;31m--> Invalid choice.\033[0m\n\033[1;32m-->Enter the correct form:  \033[0m";
         }
     } while (x == false);
@@ -638,32 +630,189 @@ void add_to_txt_file(userList *list)
     return;
 }
 
-void transaction_access_2_accounts(userList *list)
-{
-    int ID1, ID2;
-    string IBAN1, IBAN2;
-    double ammount;
-    cout << "\033[1;33mEnter the ID of the first account: \033[0m";
-    ID_checker(ID1);
-    cout << "\033[1;33mEnter the IBNA of the first User: \033[0m";
-    getline(cin, IBAN1);
-    cout << "\033[1;33mEnter the ID of the second account: \033[0m";
-    ID_checker(ID2);
-    cout << "\033[1;33mEnter the IBNA of the second User: \033[0m";
-    getline(cin, IBAN2);
-    cout << "\033[1;33mEnter the ammount that you want to transfer: \033[0m";
-    cin >> ammount;
+double convert_currency(string currency_1, string currency_2,double amount) {
+    double LL_rate = 89000;  
+    double euro_rate = 0.85;   
+    
+    if (currency_1 == currency_2) {
+        return amount;
+    }
+    
+    double usd_amount;
+    
+    if (currency_1 == "L.L") {
+        usd_amount = amount / LL_rate;
+    } else if (currency_1 != "$" && currency_1 != "L.L") {
+        usd_amount = amount / euro_rate;
+    } else { 
+        usd_amount = amount;
+    }
+    
+    if (currency_2 == "L.L") {
+        return usd_amount * LL_rate;
+    } else if (currency_2 != "$" && currency_2 != "L.L") {
+        return usd_amount * euro_rate;
+    } else {  
+        return usd_amount;
+    }
 }
-void transaction_btw_2accs(userList *list, int size)
-{
+
+account* findAccountByIBAN(userList* list, string& IBAN) {
+    account* foundAccount = NULL;
+    do {
+        getline(cin, IBAN);
+        user* currentUser = list->head;
+        while (currentUser != NULL) {
+            account* currentAccount = currentUser->acct;
+            while (currentAccount != NULL) {
+                if (currentAccount->IBAN == IBAN) {
+                    foundAccount = currentAccount;
+                    return foundAccount;
+                }
+                currentAccount = currentAccount->next;
+            }
+            currentUser = currentUser->next;
+        }
+        
+        if (foundAccount==NULL) {
+            cout << "\033[1;31mNo account found with this IBAN.\033[0m" << endl;
+            cout << "\033[1;33mPlease re-enter the IBAN: \033[0m";
+        }
+    } while (foundAccount==NULL);
+    
+    return foundAccount;
+}
+void transfer(userList* &list, account* &account1, account* &account2, double ammount,int size){
     ostringstream dnow;
     dnow << std::put_time(localTime, "%d/%m/%Y");
     string dateString = dnow.str();
-    cout << dateString;
-    list->head->acct->txn->date = dateString;
+    // cout << dateString<<endl;
+    bool valid_amount = false;
+    double converted_ammount;
+    while (valid_amount==false) {
+        if (ammount > account1->limitWithdrawPerMonth) {
+            cout << "\033[1;31m--> The ammount is greater than the withdraw limit of the account.\033[0m\n";
+            cout << "\033[1;33mPlease re-enter the amount: \033[0m";
+            Deposit_check(ammount);
+            continue;
+        }
+        
+        converted_ammount = convert_currency(account1->currency, account2->currency, ammount);
+        cout<<converted_ammount<<endl;
+        if (converted_ammount > account2->limitDepositPerDay) {
+            cout << "\033[1;31m--> The ammount is greater than the deposit limit of the receiving account.\033[0m\n";
+            cout << "\033[1;33mPlease re-enter the amount: \033[0m";
+            Deposit_check(ammount);
+            continue;
+        }
+        
+        valid_amount = true;
+    }
+    account1->balance -= ammount;
+    cout<<"\033[1;33m--> Enter the new limit of the withdraw per month(of the first account): \033[0m";
+    Deposit_check(account1->limitWithdrawPerMonth);
+    cout<<"\033[1;33m--> Enter the new limit of the deposit per day(of the first account): \033[0m";
+    Deposit_check(account1->limitDepositPerDay);
+    cout<<"\033[1;33m--> Enter the new limit of the withdraw per month(of the second account): \033[0m";
+    Deposit_check(account2->limitWithdrawPerMonth);
+    cout<<"\033[1;33m--> Enter the new limit of the deposit per day(of the second account): \033[0m";
+    Deposit_check(account2->limitDepositPerDay);
 
-    cout << "\033[1;33m--> Enter the\n";
+
+    cout<<"test\n";
+    transaction *tmp = account1->txn;
+    if(tmp==NULL){
+        account1->txn = new transaction;
+        account1->txn->date = dateString;
+        account1->txn->amount = -ammount;
+        account1->txn->next = NULL;
+    }
+    else{
+    while(tmp->next != NULL){
+        tmp = tmp->next;
+    }
+    tmp->next = new transaction;
+    tmp->next->date = dateString;
+    tmp->next->amount = -ammount;
+    tmp->next->next = NULL;
+    account2->balance += converted_ammount;
+        
+    }
+    tmp = account2->txn;
+    if(tmp==NULL){
+        account2->txn = new transaction;
+        account2->txn->date = dateString;
+        account2->txn->amount = converted_ammount;
+        account2->txn->next = NULL;
+    }
+    else{
+    while(tmp->next != NULL){
+        tmp = tmp->next;
+    }
+    tmp->next = new transaction;
+    tmp->next->date = dateString;
+    tmp->next->amount = converted_ammount;
+    tmp->next->next = NULL;
+    }
+    cout << "\033[1;32m--> The ammount has been transferred successfully.\033[0m\n";
     return;
+}
+
+
+void transaction_access_2_accounts(userList *list, int size)
+{
+    string IBAN1, IBAN2;
+    double ammount;
+    cout << "\033[1;33mEnter the IBNA of the first User\n\033[0m";
+    account* account1 = findAccountByIBAN(list, IBAN1);
+    cout << "\033[1;33mEnter the IBNA of the second User\n \033[0m";
+    account* account2 = findAccountByIBAN(list, IBAN2);
+    cout << "\033[1;33mEnter the ammount that you want to transfer(plase note that the currency will be the same as the first account): \033[0m";
+    Deposit_check(ammount);
+
+    transfer(list, account1, account2, ammount,size);
+    choice(list, size);
+}
+
+void delete_transactions_takeinput(userList *list){
+   string date;
+    ostringstream dnow;
+    dnow << std::put_time(localTime, "%d/%m/%Y");
+    string dateString = dnow.str();
+    
+    do {
+        cout << "\033[1;33mEnter the date of the transactions you want to delete (DD/MM/YYYY): \033[0m";
+        getline(cin, date);
+        
+        istringstream dateStream(date);
+        tm inputTime = {};
+        
+        // Try to parse the input date using the same format
+        dateStream >> get_time(&inputTime, "%d/%m/%Y");
+        
+        if (dateStream.fail()) {
+            cout << "\033[1;31m--> Invalid date format. Please use DD/MM/YYYY format.\033[0m\n";
+            continue;
+        }
+        // Convert both dates to tm structures for proper comparison
+        istringstream currentDateStream(dateString);
+        tm currentTime = {};
+        currentDateStream >> get_time(&currentTime, "%d/%m/%Y");
+        
+        // Convert to time_t for comparison
+        time_t currentDate = mktime(&currentTime);
+        time_t inputDate = mktime(&inputTime);
+
+        if (difftime(inputDate, currentDate) > 0) {
+            cout << "\033[1;31m--> The date is invalid (cannot be in the future).\033[0m\n";
+            continue;
+        }
+        
+        break;
+        
+    } while (true);
+    
+    // delete_transactions(list, date);
 }
 
 void access_transaction(userList *list, int size)
@@ -677,19 +826,12 @@ void access_transaction(userList *list, int size)
         if (x == '1')
         {
             cin.ignore();
-            transaction_btw_2accs(list, size);
-            // A function that takes as arguments the userList, an amount, and two accounts, in order to
-            // transfer this amount from the first account to the second one. Note that:
-            // this function should take 2 accounts the transfer amount and the date
-            //  a. The amount should be greater than the balance of the account
-            //  b. You need to do a conversion if the accounts do not have the same currency.
-            //  c. Store the operations (deposit and withdraw) in the Transaction Singly list
-            //  d. Check the withdraw and deposit limits before transferring the amount
+            transaction_access_2_accounts(list, size);
         }
         else if (x == '2')
         {
             cin.ignore();
-            // delete_transactions(list,date);
+            delete_transactions_takeinput(list);
         }
         else if (x == '0')
         {
@@ -704,7 +846,44 @@ void access_transaction(userList *list, int size)
     return;
 }
 
-void choice(userList *c, int size)
+userList * sorting(userList *list){
+    user *tmp = list->head;
+    while (tmp != NULL) {
+        account* tmp2 = tmp->acct;
+        while (tmp2 != NULL) {
+            transaction* current = tmp2->txn;
+            while (current != NULL) {
+                transaction* min_value = current;
+                transaction* tmp3 = current->next;
+                
+                while (tmp3 != NULL) {
+                    if (tmp3->date < min_value->date) {
+                        min_value = tmp3;
+                    }
+                    tmp3 = tmp3->next;
+                }
+                
+                if (min_value != current) {
+                    transaction* transaction_tmp = new transaction;
+                    transaction_tmp->date = current->date;
+                    transaction_tmp->amount = current->amount;
+                    current->date = min_value->date;
+                    min_value->date = transaction_tmp->date;
+                    current->amount = min_value->amount;
+                    min_value->amount = transaction_tmp->amount;
+                    delete transaction_tmp;
+                }
+                
+                current = current->next;
+            }
+            tmp2 = tmp2->next;
+        }
+        tmp = tmp->next;
+    }
+    return list;
+}
+
+void choice(userList *userlist, int size)
 {
     char x;
     cout << "\033[1;33m--> ~Press 1 to access a account.\n--> ~Press 2 to add a account.\n--> ~Press 3 to access the transaction menu.\n--> ~Press 0 to exit.\033[0m " << endl;
@@ -714,21 +893,22 @@ void choice(userList *c, int size)
         if (x == '2')
         {
             cin.ignore();
-            AddNewUser(c, size);
+            AddNewUser(userlist, size);
         }
         else if (x == '1')
         {
             cin.ignore();
-            access(c, size);
+            access(userlist, size);
         }
         else if (x == '3')
         {
             cin.ignore();
-            access_transaction(c, size);
+            access_transaction(userlist, size);
         }
         else if (x == '0')
         {
-            add_to_txt_file(c);
+            userlist=sorting(userlist);
+            add_to_txt_file(userlist);
             cout << "\033[30m-->Thanks for using our service.<--\033[0m\n";
         }
         else
@@ -747,10 +927,9 @@ int main()
     list->tail = NULL;
     list = readFromFile(list);
     int size = sizereaderusr();
-    transaction_btw_2accs(list, size);
+    // transaction_btw_2accs(list, size);
     cout << endl;
     choice(list, size);
-    // sorting(list);
     // the print function is changing the format after it prints so it the lists wont work after entering it be care full change it later also fix the setw() in it so it can calculat the length
     print(list);
     delete list;
