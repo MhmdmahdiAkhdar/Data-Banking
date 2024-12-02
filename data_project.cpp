@@ -4,17 +4,15 @@
 #include <fstream>
 #include <cstring>
 #include <cctype>
-#include<cmath>
+#include <cmath>
 #include <windows.h>
 #include <locale>
 #include <iomanip>
-// #include <ctime>
-// #include <chrono>
-// #include<ios>
-
-// to get the current time
-// time_t currentTime = time(NULL);
-// struct tm *localTime = localtime(&currentTime);
+#include <ctime>
+#include <chrono>
+#include <ios>
+time_t currentTime = time(NULL); // to get the current time
+struct tm *localTime = localtime(&currentTime);
 
 using namespace std;
 
@@ -51,29 +49,32 @@ struct userList
 void choice(userList *, int);
 void access(userList *list, int size);
 void accesschoice(userList *list, int size, int ID);
-void print(userList*);
-void access_transaction(userList *,int);
+void print(userList *);
+void access_transaction(userList *, int);
 
-//the function read from file is done and tested every thing is working fine including the transactions
-userList* readFromFile(userList* list) {
-    
-    fstream input("input.txt",ios::in);
+// the function read from file is done and tested every thing is working fine including the transactions
+userList *readFromFile(userList *list)
+{
+
+    fstream input("input.txt", ios::in);
     string line;
-    user* currentUser = NULL;
-    account* currentAccount = NULL;
+    user *currentUser = NULL;
+    account *currentAccount = NULL;
 
-    while (getline(input, line)) {
+    while (getline(input, line))
+    {
 
-        if (line[0] == '-') {
+        if (line[0] == '-')
+        {
             line = line.substr(1);
             stringstream ss(line);
             string userIDStr, fname, lname;
-            
+
             getline(ss, userIDStr, ',');
             getline(ss, fname, ',');
             getline(ss, lname);
 
-            user* newUser = new user;
+            user *newUser = new user;
             newUser->userID = stoi(userIDStr);
             newUser->fname = fname;
             newUser->lname = lname;
@@ -81,29 +82,33 @@ userList* readFromFile(userList* list) {
             newUser->next = NULL;
             newUser->previous = NULL;
 
-            if (list->head==NULL) {
+            if (list->head == NULL)
+            {
                 list->head = newUser;
                 list->tail = newUser;
-            } else {
+            }
+            else
+            {
                 newUser->previous = list->tail;
                 list->tail->next = newUser;
                 list->tail = newUser;
             }
             currentUser = newUser;
         }
-        
-        else if (line[0] == '#') {
+
+        else if (line[0] == '#')
+        {
             line = line.substr(1);
             stringstream ss(line);
             string IBAN, accountName, balanceStr, limitDStr, limitWStr;
-            
+
             getline(ss, IBAN, ',');
             getline(ss, accountName, ',');
             getline(ss, balanceStr, ',');
             getline(ss, limitDStr, ',');
             getline(ss, limitWStr);
 
-            account* newAccount = new account;
+            account *newAccount = new account;
             newAccount->IBAN = IBAN;
             newAccount->accountName = accountName;
             newAccount->txn = NULL;
@@ -111,49 +116,65 @@ userList* readFromFile(userList* list) {
 
             string currency;
             double balance, limitD, limitW;
-            
+
             int pos = balanceStr.find_first_not_of("0123456789.");
-            
+
             balance = stod(balanceStr.substr(0, pos));
             currency = balanceStr.substr(pos);
             pos = limitDStr.find_first_not_of("0123456789.");
             limitD = stod(limitDStr.substr(0, pos));
             pos = limitWStr.find_first_not_of("0123456789.");
             limitW = stod(limitWStr.substr(0, pos));
-            
+
             newAccount->balance = balance;
             newAccount->currency = currency;
             newAccount->limitDepositPerDay = limitD;
             newAccount->limitWithdrawPerMonth = limitW;
 
-            if (currentUser->acct==NULL) {
+            if (currentUser->acct == NULL)
+            {
                 currentUser->acct = newAccount;
             }
-            else {
-                account* temp = currentUser->acct;
-                while (temp->next) {
+            else
+            {
+                account *temp = currentUser->acct;
+                while (temp->next)
+                {
                     temp = temp->next;
                 }
                 temp->next = newAccount;
             }
             currentAccount = newAccount;
         }
-        else if (line[0] == '*') {
+        else if (line[0] == '*')
+        {
             line = line.substr(1);
             stringstream ss(line);
             string date, amountStr;
             getline(ss, date, ',');
             getline(ss, amountStr);
 
-            transaction* newTransaction = new transaction;
+            transaction *newTransaction = new transaction;
             newTransaction->date = date;
-            
-            int pos = amountStr.find_first_not_of("0123456789.");
-            
+
+            int pos = amountStr.find_first_not_of("0123456789.-");
+
             newTransaction->amount = stod(amountStr.substr(0, pos));
-        
-            newTransaction->next = currentAccount->txn;
-            currentAccount->txn = newTransaction;
+            newTransaction->next = NULL;
+
+            if (currentAccount->txn == NULL)
+            {
+                currentAccount->txn = newTransaction;
+            }
+            else
+            {
+                transaction *temp = currentAccount->txn;
+                while (temp->next != NULL)
+                {
+                    temp = temp->next;
+                }
+                temp->next = newTransaction;
+            }
         }
     }
 
@@ -162,24 +183,28 @@ userList* readFromFile(userList* list) {
 }
 
 // prints every thing this may be deleted later on
-void print(userList* list) {
-    user* travel = list->head;
-    while (travel != NULL) {
+void print(userList *list)
+{
+    user *travel = list->head;
+    while (travel != NULL)
+    {
         cout << "-" << travel->userID << setw(20) << travel->fname << setw(20) << travel->lname << endl;
-        
-        account* currentAccount = travel->acct;
-        while (currentAccount != NULL) {
-            cout << "#" << currentAccount->IBAN << "," << currentAccount->accountName << "," 
-                 << currentAccount->balance << currentAccount->currency << "," 
-                 << currentAccount->limitDepositPerDay << "," 
+
+        account *currentAccount = travel->acct;
+        while (currentAccount != NULL)
+        {
+            cout << "#" << currentAccount->IBAN << "," << currentAccount->accountName << ","
+                 << currentAccount->balance << currentAccount->currency << ","
+                 << currentAccount->limitDepositPerDay << ","
                  << currentAccount->limitWithdrawPerMonth << endl;
-            
-            transaction* currentTxn = currentAccount->txn;
-            while (currentTxn != NULL) {
+
+            transaction *currentTxn = currentAccount->txn;
+            while (currentTxn != NULL)
+            {
                 cout << "*" << currentTxn->date << "," << currentTxn->amount << endl;
                 currentTxn = currentTxn->next;
             }
-            
+
             currentAccount = currentAccount->next;
         }
         travel = travel->next;
@@ -261,45 +286,54 @@ string allocation_input()
     return choice;
 }
 
-void insert(userList *&list, user *newUser) {
-    if (list->head == NULL) {
+void insert(userList *&list, user *newUser)
+{
+    if (list->head == NULL)
+    {
         list->head = newUser;
         list->tail = newUser;
-    } else {
+    }
+    else
+    {
         list->tail->next = newUser;
         list->tail = newUser;
     }
     return;
 }
-void AddNewUser(userList *&list, int &val) {
+void AddNewUser(userList *&list, int &val)
+{
     string first, last;
     bool x;
     val += 1;
     string q = "2";
-    do {
+    do
+    {
         cout << "--> Enter First Name:  ";
         checkname(first);
         cout << "-->Enter Last Name:  ";
         checkname(last);
-        x = repetion(list->head, first, last); 
-        if (x == true) {
+        x = repetion(list->head, first, last);
+        if (x == true)
+        {
             q = allocation_input();
-            if (q == "1") {
-                access(list, val);  
+            if (q == "1")
+            {
+                access(list, val);
                 break;
             }
         }
     } while (x == true);
-    
-    if (q == "2") {
-        user* newUser = new user;
+
+    if (q == "2")
+    {
+        user *newUser = new user;
         newUser->userID = val;
         newUser->fname = first;
         newUser->lname = last;
         newUser->acct = NULL;
         newUser->next = NULL;
         newUser->previous = NULL;
-        insert(list,newUser);
+        insert(list, newUser);
         cout << "\033[1;32m--> An account has been created....\nYour ID is: " << val << "\033[0m\n";
         choice(list, val);
     }
@@ -412,29 +446,41 @@ void IBAN_confirm(user *tmp, string &IBAN)
         isUnique = true;
         cout << "\033[1;33m--> Enter the IBAN of the new account: \033[0m";
         getline(cin, IBAN);
-        account *tmpacc = tmp->acct;
-        while (tmpacc != NULL)
+        user *tmps = tmp;
+        while (tmps != NULL)
         {
-            if (IBAN == tmpacc->IBAN)
+            account *tmpacc = tmps->acct;
+            while (tmpacc != NULL)
             {
-                cout << "\033[1;31m--> This IBAN already exists, please enter a different one:\n \033[0m";
-                isUnique = false;
+                if (IBAN == tmpacc->IBAN)
+                {
+                    cout << "\033[1;31m--> This IBAN already exists, please enter a different one.\n \033[0m";
+                    isUnique = false;
+                    break;
+                }
+                tmpacc = tmpacc->next;
+            }
+            if (isUnique == false)
+            {
                 break;
             }
-            tmpacc = tmpacc->next;
+            tmps = tmps->next;
         }
-    } while (!isUnique );
+    } while (!isUnique);
     return;
 }
 
-void add_account_to_user(userList *&list, user *targetUser, account *newAccount) 
+void add_account_to_user(userList *&list, user *targetUser, account *newAccount)
 {
-    if (targetUser->acct == NULL) {
+    if (targetUser->acct == NULL)
+    {
         targetUser->acct = newAccount;
-    } 
-    else {
-        account* current = targetUser->acct;
-        while (current->next != NULL) {
+    }
+    else
+    {
+        account *current = targetUser->acct;
+        while (current->next != NULL)
+        {
             current = current->next;
         }
         current->next = newAccount;
@@ -462,7 +508,7 @@ void add_new_User(userList *list, int size, int ID)
     cout << "\033[1;33mEnter the limit Withdraw PerMonth of the new account: \033[0m";
     Deposit_check(limitWPM);
 
-    account* newAccount = new account;
+    account *newAccount = new account;
     newAccount->IBAN = IBAN;
     newAccount->accountName = type;
     newAccount->balance = balance;
@@ -471,7 +517,7 @@ void add_new_User(userList *list, int size, int ID)
     newAccount->limitWithdrawPerMonth = limitWPM;
     newAccount->txn = NULL;
     newAccount->next = NULL;
-   
+
     add_account_to_user(list, tmp, newAccount);
     accesschoice(list, size, ID);
     return;
@@ -547,32 +593,41 @@ void access(userList *list, int size)
     return;
 }
 
-//this function is done but not tested for the transaction function
-void add_to_txt_file(userList *list) {
+// this function is done but not tested for the transaction function
+void add_to_txt_file(userList *list)
+{
     fstream input;
     user *travel = list->head;
     int q = 0;
     input.open("input.txt", ios::out);
-    
-    while (travel != NULL) {
-        if (q == 0) {
+
+    while (travel != NULL)
+    {
+        if (q == 0)
+        {
             input << "-" << travel->userID << "," << travel->fname << "," << travel->lname;
             q++;
-        } else {
-            input << endl << "-" << travel->userID << "," << travel->fname << "," << travel->lname;
+        }
+        else
+        {
+            input << endl
+                  << "-" << travel->userID << "," << travel->fname << "," << travel->lname;
         }
 
         account *tmp2 = travel->acct;
-        while (tmp2 != NULL) {
+        while (tmp2 != NULL)
+        {
             input << endl
-                  << "#" << tmp2->IBAN << "," << tmp2->accountName << "," 
-                  << tmp2->balance << tmp2->currency << "," 
-                  << tmp2->limitDepositPerDay << tmp2->currency << "," 
+                  << "#" << tmp2->IBAN << "," << tmp2->accountName << ","
+                  << tmp2->balance << tmp2->currency << ","
+                  << tmp2->limitDepositPerDay << tmp2->currency << ","
                   << tmp2->limitWithdrawPerMonth << tmp2->currency;
-         
+
             transaction *tmp3 = tmp2->txn;
-            while(tmp3 != NULL) {
-                input << endl << "*" << tmp3->date << "," << tmp3->amount;
+            while (tmp3 != NULL)
+            {
+                input << endl
+                      << "*" << tmp3->date << "," << tmp3->amount << tmp2->currency;
                 tmp3 = tmp3->next;
             }
             tmp2 = tmp2->next;
@@ -582,7 +637,37 @@ void add_to_txt_file(userList *list) {
     input.close();
     return;
 }
-void access_transaction(userList *list,int size){
+
+void transaction_access_2_accounts(userList *list)
+{
+    int ID1, ID2;
+    string IBAN1, IBAN2;
+    double ammount;
+    cout << "\033[1;33mEnter the ID of the first account: \033[0m";
+    ID_checker(ID1);
+    cout << "\033[1;33mEnter the IBNA of the first User: \033[0m";
+    getline(cin, IBAN1);
+    cout << "\033[1;33mEnter the ID of the second account: \033[0m";
+    ID_checker(ID2);
+    cout << "\033[1;33mEnter the IBNA of the second User: \033[0m";
+    getline(cin, IBAN2);
+    cout << "\033[1;33mEnter the ammount that you want to transfer: \033[0m";
+    cin >> ammount;
+}
+void transaction_btw_2accs(userList *list, int size)
+{
+    ostringstream dnow;
+    dnow << std::put_time(localTime, "%d/%m/%Y");
+    string dateString = dnow.str();
+    cout << dateString;
+    list->head->acct->txn->date = dateString;
+
+    cout << "\033[1;33m--> Enter the\n";
+    return;
+}
+
+void access_transaction(userList *list, int size)
+{
     char x;
     cout << endl
          << "\033[1;33m--> ~Press 1 to start a transaction btween 2 users .\n--> ~Press 2 to delete transactions before a certain date .\n--> ~Press 0 to Return.\033[0m " << endl;
@@ -592,11 +677,14 @@ void access_transaction(userList *list,int size){
         if (x == '1')
         {
             cin.ignore();
-            //this function should take 2 accounts the transfer amount and the date
-            // a. The amount should be greater than the balance of the account 
-            // b. You need to do a conversion if the accounts do not have the same currency.  
-            // c. Store the operations (deposit and withdraw) in the Transaction Singly list 
-            // d. Check the withdraw and deposit limits before transferring the amount
+            transaction_btw_2accs(list, size);
+            // A function that takes as arguments the userList, an amount, and two accounts, in order to
+            // transfer this amount from the first account to the second one. Note that:
+            // this function should take 2 accounts the transfer amount and the date
+            //  a. The amount should be greater than the balance of the account
+            //  b. You need to do a conversion if the accounts do not have the same currency.
+            //  c. Store the operations (deposit and withdraw) in the Transaction Singly list
+            //  d. Check the withdraw and deposit limits before transferring the amount
         }
         else if (x == '2')
         {
@@ -618,7 +706,6 @@ void access_transaction(userList *list,int size){
 
 void choice(userList *c, int size)
 {
-    // print(c);
     char x;
     cout << "\033[1;33m--> ~Press 1 to access a account.\n--> ~Press 2 to add a account.\n--> ~Press 3 to access the transaction menu.\n--> ~Press 0 to exit.\033[0m " << endl;
     do
@@ -637,7 +724,7 @@ void choice(userList *c, int size)
         else if (x == '3')
         {
             cin.ignore();
-            access_transaction(c,size);
+            access_transaction(c, size);
         }
         else if (x == '0')
         {
@@ -648,21 +735,23 @@ void choice(userList *c, int size)
         {
             cout << "\033[1;31m--> Invalid choice.\033[0m\n";
         }
-    } while (x != '1' && x != '2' && x!='3' && x != '0');
+    } while (x != '1' && x != '2' && x != '3' && x != '0');
     return;
 }
 int main()
-{   
+{
     SetConsoleCP(CP_UTF8);
-    SetConsoleOutputCP(CP_UTF8);  // Set console to UTF-8
-    userList* list=new userList;
-    list->head=NULL;
-    list->tail=NULL;
+    SetConsoleOutputCP(CP_UTF8); // Set console to UTF-8
+    userList *list = new userList;
+    list->head = NULL;
+    list->tail = NULL;
     list = readFromFile(list);
     int size = sizereaderusr();
+    transaction_btw_2accs(list, size);
+    cout << endl;
     choice(list, size);
     // sorting(list);
-    //the print function is changing the format after it prints so it the lists wont work after entering it be care full change it later also fix the setw() in it so it can calculat the length
+    // the print function is changing the format after it prints so it the lists wont work after entering it be care full change it later also fix the setw() in it so it can calculat the length
     print(list);
     delete list;
 }

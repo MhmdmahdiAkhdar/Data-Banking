@@ -4,7 +4,7 @@
 #include <fstream>
 #include <cstring>
 #include <cctype>
-#include<cmath>
+#include <cmath>
 #include <iomanip>
 // #include <ctime>
 // #include <chrono>
@@ -94,7 +94,7 @@ user *readfromfile(user *&head)
         {
             line = line.substr(1);
             stringstream ss(line);
-            string IBAN, accName, currency, balandcur, limitPD , limitPDandcurr , limitPM , limitPMandcurr , balance;
+            string IBAN, accName, currency, balandcur, limitPD, limitPDandcurr, limitPM, limitPMandcurr, balance;
             getline(ss, IBAN, ',');
             getline(ss, accName, ',');
             getline(ss, balandcur, ',');
@@ -118,7 +118,7 @@ user *readfromfile(user *&head)
             newAccount->limitWithdrawPerMonth = stod(limitPM);
             newAccount->txn = NULL;
             newAccount->next = NULL;
-            cout<<newAccount->balance<<endl;
+            cout << newAccount->balance << endl;
             account *tmp = tail->acct;
             if (tmp == NULL)
             {
@@ -413,7 +413,7 @@ void IBAN_confirm(user *tmp, string &IBAN)
         //     else
         //         x = true;
         // }
-    } while (!isUnique );
+    } while (!isUnique);
     return;
 }
 
@@ -468,8 +468,8 @@ void add_new_User(user *node, int size, int ID)
     return;
 }
 
-void access_transaction(){
-
+void access_transaction()
+{
 }
 
 void accesschoice(user *node, int size, int ID)
@@ -566,12 +566,14 @@ void add_to_txt_file(user *node)
         while (tmp2 != NULL)
         {
             input << endl
-                  << "#" << tmp2->IBAN << "," << tmp2->accountName << "," << tmp2->balance << tmp2->currency << "," << tmp2->limitDepositPerDay<< tmp2->currency << "," << tmp2->limitWithdrawPerMonth<< tmp2->currency;
-         
-            transaction *tmp3=tmp2->txn;
-            while(tmp3!=NULL){
-                input<<endl<<"*"<<tmp3->date<<","<<tmp3->amount;
-                tmp3=tmp3->next;
+                  << "#" << tmp2->IBAN << "," << tmp2->accountName << "," << tmp2->balance << tmp2->currency << "," << tmp2->limitDepositPerDay << tmp2->currency << "," << tmp2->limitWithdrawPerMonth << tmp2->currency;
+
+            transaction *tmp3 = tmp2->txn;
+            while (tmp3 != NULL)
+            {
+                input << endl
+                      << "*" << tmp3->date << "," << tmp3->amount;
+                tmp3 = tmp3->next;
             }
             tmp2 = tmp2->next;
         }
@@ -614,14 +616,14 @@ void choice(user *c, int size)
 }
 int main()
 {
-    userList* nodes=new userList;
-    nodes->head=NULL;
+    userList *nodes = new userList;
+    nodes->head = NULL;
     user *node = new user;
     node = NULL;
     node = readfromfile(node);
     int size = sizereaderusr();
     choice(node, size);
-    //the print function is changing the format after it prints so it the lists wont work after entering it be care full change it later also fix the setw() in it so it can calculat the length
-    print(node);
+    // the print function is changing the format after it prints so it the lists wont work after entering it be care full change it later also fix the setw() in it so it can calculat the length
+    print(node); // hello
     delete node;
 }
