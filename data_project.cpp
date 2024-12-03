@@ -15,7 +15,7 @@ time_t currentTime = time(NULL); // to get the current time
 struct tm *localTime = localtime(&currentTime);
 
 using namespace std;
-
+using namespace chrono;
 struct transaction
 {
     string date;
@@ -774,45 +774,81 @@ void transaction_access_2_accounts(userList *list, int size)
     choice(list, size);
 }
 
-void delete_transactions_takeinput(userList *list){
-   string date;
-    ostringstream dnow;
-    dnow << std::put_time(localTime, "%d/%m/%Y");
-    string dateString = dnow.str();
-    
+//assaf ???
+void sdatecheck(string &date)
+{
+   bool x;
+    auto now = chrono::system_clock::now();
     do {
-        cout << "\033[1;33mEnter the date of the transactions you want to delete (DD/MM/YYYY): \033[0m";
+        cout << "-->";
+        x = true;
         getline(cin, date);
-        
-        istringstream dateStream(date);
-        tm inputTime = {};
-        
-        // Try to parse the input date using the same format
-        dateStream >> get_time(&inputTime, "%d/%m/%Y");
-        
-        if (dateStream.fail()) {
-            cout << "\033[1;31m--> Invalid date format. Please use DD/MM/YYYY format.\033[0m\n";
-            continue;
+        tm time = {};                         // in ctime lib
+        istringstream datee(date);            // s stream
+        datee >> get_time(&time, "%d/%m/%Y"); // function format
+        if (datee.fail()) {
+            cout << "\033[1;31mInvalid format, please enter a valid one.\033[0m\n";
+            x = false;
+        } else {
+            auto usertime = chrono::system_clock::from_time_t(mktime(&time)); // user input time
+            
+            if (usertime >= now) {
+                cout << "\033[1;31mPlease enter a date from the past.\033[0m\n";
+                x = false;
+            }
         }
-        // Convert both dates to tm structures for proper comparison
-        istringstream currentDateStream(dateString);
-        tm currentTime = {};
-        currentDateStream >> get_time(&currentTime, "%d/%m/%Y");
-        
-        // Convert to time_t for comparison
-        time_t currentDate = mktime(&currentTime);
-        time_t inputDate = mktime(&inputTime);
+    } while (!x );
 
-        if (difftime(inputDate, currentDate) > 0) {
-            cout << "\033[1;31m--> The date is invalid (cannot be in the future).\033[0m\n";
-            continue;
-        }
-        
-        break;
-        
-    } while (true);
+return;
+}
+
+userList *delete_transactions(userList *list, string date) {
+    tm inputTime = {};
+    istringstream dateStream(date);
+    dateStream >> get_time(&inputTime, "%d/%m/%Y");
     
-    // delete_transactions(list, date);
+    user *tmp = list->head;
+    while(tmp != NULL) {
+        account *tmpacc = tmp->acct;
+        while(tmpacc != NULL) {
+            transaction *tmptran = tmpacc->txn;
+            transaction *prev = NULL;
+            
+            while(tmptran != NULL) {
+                tm transactionTime = {};
+                istringstream transStream(tmptran->date);
+                transStream >> get_time(&transactionTime, "%d/%m/%Y");
+                
+                auto inputDateTime = system_clock::from_time_t(mktime(&inputTime));
+                auto transactionDateTime = system_clock::from_time_t(mktime(&transactionTime));
+                
+                if(inputDateTime >= transactionDateTime) {
+                    if(prev == NULL) {
+                        tmpacc->txn = tmptran->next;
+                        delete tmptran;
+                        tmptran = tmpacc->txn;
+                    } else {
+                        prev->next = tmptran->next;
+                        delete tmptran;
+                        tmptran = prev->next;
+                    }
+                } else {
+                    prev = tmptran;
+                    tmptran = tmptran->next;
+                }
+            }
+            tmpacc = tmpacc->next;
+        }
+        tmp = tmp->next;
+    }
+    return list;
+}
+
+void delete_devider(userList * list,int size){
+    string date;
+    sdatecheck(date);
+    list=delete_transactions(list, date);
+    access_transaction(list,size);
 }
 
 void access_transaction(userList *list, int size)
@@ -831,7 +867,7 @@ void access_transaction(userList *list, int size)
         else if (x == '2')
         {
             cin.ignore();
-            delete_transactions_takeinput(list);
+            delete_devider(list,size);
         }
         else if (x == '0')
         {

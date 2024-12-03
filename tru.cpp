@@ -1124,9 +1124,9 @@ void sdatecheck(string &date)
         }
         else
         {
-            auto usertime = chrono::system_clock::from_time_t(mktime(&time)); // user input time
-            auto now = chrono::system_clock::now();                           // curent date
-            if (usertime < now)
+            auto usertime = chrono::system_clock::from_time_t(mktime(&time));
+            auto now = chrono::system_clock::now();
+            if (usertime <=now)
             {
                 cout << "\033[1;31mPlease enter a date that you can use the car in! You can't go back in time.\033[0m\n";
                 x = false;
