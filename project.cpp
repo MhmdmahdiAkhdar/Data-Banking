@@ -15,7 +15,7 @@ time_t currentTime = time(NULL); // to get the current time
 struct tm *localTime = localtime(&currentTime);
 
 using namespace std;
-
+using namespace chrono;
 struct transaction
 {
     string date;
@@ -183,7 +183,6 @@ userList *readFromFile(userList *list)
     return list;
 }
 
-// prints every thing this may be deleted later on
 void print(userList *list)
 {
     user *travel = list->head;
@@ -212,6 +211,8 @@ void print(userList *list)
     }
     return;
 }
+
+
 int sizereaderusr()
 {
     fstream file;
@@ -698,6 +699,7 @@ void transfer(userList* &list, account* &account1, account* &account2, double am
         }
         
         converted_ammount = convert_currency(account1->currency, account2->currency, ammount);
+        cout<<converted_ammount<<endl;
         if (converted_ammount > account2->limitDepositPerDay) {
             cout << "\033[1;31m--> The ammount is greater than the deposit limit of the receiving account.\033[0m\n";
             cout << "\033[1;33mPlease re-enter the amount: \033[0m";
@@ -708,18 +710,25 @@ void transfer(userList* &list, account* &account1, account* &account2, double am
         valid_amount = true;
     }
     account1->balance -= ammount;
-    cout<<"Enter the new limit of the withdraw per month(of the first account): ";
+    cout<<"\033[1;33m--> Enter the new limit of the withdraw per month(of the first account): \033[0m";
     Deposit_check(account1->limitWithdrawPerMonth);
-    cout<<"Enter the new limit of the deposit per day(of the first account): ";
+    cout<<"\033[1;33m--> Enter the new limit of the deposit per day(of the first account): \033[0m";
     Deposit_check(account1->limitDepositPerDay);
-    cout<<"Enter the new limit of the withdraw per month(of the second account): ";
+    cout<<"\033[1;33m--> Enter the new limit of the withdraw per month(of the second account): \033[0m";
     Deposit_check(account2->limitWithdrawPerMonth);
-    cout<<"Enter the new limit of the deposit per day(of the second account): ";
+    cout<<"\033[1;33m--> Enter the new limit of the deposit per day(of the second account): \033[0m";
     Deposit_check(account2->limitDepositPerDay);
 
 
-    
+    cout<<"test\n";
     transaction *tmp = account1->txn;
+    if(tmp==NULL){
+        account1->txn = new transaction;
+        account1->txn->date = dateString;
+        account1->txn->amount = -ammount;
+        account1->txn->next = NULL;
+    }
+    else{
     while(tmp->next != NULL){
         tmp = tmp->next;
     }
@@ -728,7 +737,16 @@ void transfer(userList* &list, account* &account1, account* &account2, double am
     tmp->next->amount = -ammount;
     tmp->next->next = NULL;
     account2->balance += converted_ammount;
+        
+    }
     tmp = account2->txn;
+    if(tmp==NULL){
+        account2->txn = new transaction;
+        account2->txn->date = dateString;
+        account2->txn->amount = converted_ammount;
+        account2->txn->next = NULL;
+    }
+    else{
     while(tmp->next != NULL){
         tmp = tmp->next;
     }
@@ -736,9 +754,12 @@ void transfer(userList* &list, account* &account1, account* &account2, double am
     tmp->next->date = dateString;
     tmp->next->amount = converted_ammount;
     tmp->next->next = NULL;
+    }
     cout << "\033[1;32m--> The ammount has been transferred successfully.\033[0m\n";
     return;
 }
+
+
 void transaction_access_2_accounts(userList *list, int size)
 {
     string IBAN1, IBAN2;
@@ -754,6 +775,83 @@ void transaction_access_2_accounts(userList *list, int size)
     choice(list, size);
 }
 
+//assaf ???
+void sdatecheck(string &date)
+{
+   bool x;
+    auto now = chrono::system_clock::now();
+    do {
+        cout << "-->";
+        x = true;
+        getline(cin, date);
+        tm time = {};                         // in ctime lib
+        istringstream datee(date);            // s stream
+        datee >> get_time(&time, "%d/%m/%Y"); // function format
+        if (datee.fail()) {
+            cout << "\033[1;31mInvalid format, please enter a valid one.\033[0m\n";
+            x = false;
+        } else {
+            auto usertime = chrono::system_clock::from_time_t(mktime(&time)); // user input time
+            
+            if (usertime >= now) {
+                cout << "\033[1;31mPlease enter a date from the past.\033[0m\n";
+                x = false;
+            }
+        }
+    } while (!x );
+
+return;
+}
+
+userList *delete_transactions(userList *list, string date) {
+    tm inputTime = {};
+    istringstream dateStream(date);
+    dateStream >> get_time(&inputTime, "%d/%m/%Y");
+    
+    user *tmp = list->head;
+    while(tmp != NULL) {
+        account *tmpacc = tmp->acct;
+        while(tmpacc != NULL) {
+            transaction *tmptran = tmpacc->txn;
+            transaction *prev = NULL;
+            
+            while(tmptran != NULL) {
+                tm transactionTime = {};
+                istringstream transStream(tmptran->date);
+                transStream >> get_time(&transactionTime, "%d/%m/%Y");
+                
+                auto inputDateTime = system_clock::from_time_t(mktime(&inputTime));
+                auto transactionDateTime = system_clock::from_time_t(mktime(&transactionTime));
+                
+                if(inputDateTime >= transactionDateTime) {
+                    if(prev == NULL) {
+                        tmpacc->txn = tmptran->next;
+                        delete tmptran;
+                        tmptran = tmpacc->txn;
+                    } else {
+                        prev->next = tmptran->next;
+                        delete tmptran;
+                        tmptran = prev->next;
+                    }
+                } else {
+                    prev = tmptran;
+                    tmptran = tmptran->next;
+                }
+            }
+            tmpacc = tmpacc->next;
+        }
+        tmp = tmp->next;
+    }
+    return list;
+}
+
+void delete_devider(userList * list,int size){
+    string date;
+    sdatecheck(date);
+    list=delete_transactions(list, date);
+    access_transaction(list,size);
+}
+
 void access_transaction(userList *list, int size)
 {
     char x;
@@ -766,18 +864,11 @@ void access_transaction(userList *list, int size)
         {
             cin.ignore();
             transaction_access_2_accounts(list, size);
-            // A function that takes as arguments the userList, an amount, and two accounts, in order to
-            // transfer this amount from the first account to the second one. Note that:
-            // this function should take 2 accounts the transfer amount and the date
-            //  a. The amount should be less than the balance of the account done
-            //  b. You need to do a conversion if the accounts do not have the same currency. done
-            //  c. Store the operations (deposit and withdraw) in the Transaction Singly list done
-            //  d. Check the withdraw and deposit limits before transferring the amount done
         }
         else if (x == '2')
         {
             cin.ignore();
-            // delete_transactions(list,date);
+            delete_devider(list,size);
         }
         else if (x == '0')
         {
@@ -792,7 +883,44 @@ void access_transaction(userList *list, int size)
     return;
 }
 
-void choice(userList *c, int size)
+userList * sorting(userList *list){
+    user *tmp = list->head;
+    while (tmp != NULL) {
+        account* tmp2 = tmp->acct;
+        while (tmp2 != NULL) {
+            transaction* current = tmp2->txn;
+            while (current != NULL) {
+                transaction* min_value = current;
+                transaction* tmp3 = current->next;
+                
+                while (tmp3 != NULL) {
+                    if (tmp3->date < min_value->date) {
+                        min_value = tmp3;
+                    }
+                    tmp3 = tmp3->next;
+                }
+                
+                if (min_value != current) {
+                    transaction* transaction_tmp = new transaction;
+                    transaction_tmp->date = current->date;
+                    transaction_tmp->amount = current->amount;
+                    current->date = min_value->date;
+                    min_value->date = transaction_tmp->date;
+                    current->amount = min_value->amount;
+                    min_value->amount = transaction_tmp->amount;
+                    delete transaction_tmp;
+                }
+                
+                current = current->next;
+            }
+            tmp2 = tmp2->next;
+        }
+        tmp = tmp->next;
+    }
+    return list;
+}
+
+void choice(userList *userlist, int size)
 {
     char x;
     cout << "\033[1;33m--> ~Press 1 to access a account.\n--> ~Press 2 to add a account.\n--> ~Press 3 to access the transaction menu.\n--> ~Press 0 to exit.\033[0m " << endl;
@@ -802,21 +930,22 @@ void choice(userList *c, int size)
         if (x == '2')
         {
             cin.ignore();
-            AddNewUser(c, size);
+            AddNewUser(userlist, size);
         }
         else if (x == '1')
         {
             cin.ignore();
-            access(c, size);
+            access(userlist, size);
         }
         else if (x == '3')
         {
             cin.ignore();
-            access_transaction(c, size);
+            access_transaction(userlist, size);
         }
         else if (x == '0')
         {
-            add_to_txt_file(c);
+            userlist=sorting(userlist);
+            add_to_txt_file(userlist);
             cout << "\033[30m-->Thanks for using our service.<--\033[0m\n";
         }
         else
@@ -835,10 +964,8 @@ int main()
     list->tail = NULL;
     list = readFromFile(list);
     int size = sizereaderusr();
-    // transaction_btw_2accs(list, size);
     cout << endl;
     choice(list, size);
-    // sorting(list);
     // the print function is changing the format after it prints so it the lists wont work after entering it be care full change it later also fix the setw() in it so it can calculat the length
     print(list);
     delete list;

@@ -480,7 +480,7 @@ void add_account_to_user(userList *&list, user *targetUser, account *newAccount)
     return;
 }
 
-void add_new_User(userList *list, int size, int ID)
+void add_new_Account(userList *list, int size, int ID)
 {
     user *tmp = list->head;
     while (tmp != NULL && tmp->userID != ID)
@@ -511,38 +511,7 @@ void add_new_User(userList *list, int size, int ID)
     newAccount->next = NULL;
 
     add_account_to_user(list, tmp, newAccount);
-    accesschoice(list, size, ID);
-    return;
-}
-
-void accesschoice(userList *list, int size, int ID)
-{
-    char x;
-    cout << endl
-         << "\033[1;33m--> ~Press 1 to add a User .\n--> ~Press 2 to delete a User(this function is not available yet and may not be available due to limited time).\n--> ~Press 0 to Return.\033[0m " << endl;
-    do
-    {
-        cin >> x;
-        if (x == '1')
-        {
-            cin.ignore();
-            add_new_User(list, size, ID);
-        }
-        // else if (x == '2')
-        // {
-        //  this function is not available yet and may not be available due to limited time where it should have been a function to delete a user
-        //     cin.ignore();
-        // }
-        else if (x == '0')
-        {
-            choice(list, size);
-            return;
-        }
-        else
-        {
-            cout << "\033[1;31m--> Invalid choice.\033[0m\n";
-        }
-    } while (x != '1' && x != '2' && x != '0');
+    choice(list, size);
     return;
 }
 
@@ -581,7 +550,7 @@ void access(userList *list, int size)
         checkname(lastname);
         chosen = checklogin(list->head, firstname, lastname, ID);
     } while (chosen == NULL);
-    accesschoice(list, size, ID);
+    add_new_Account(list, size, ID);
     return;
 }
 
@@ -882,6 +851,24 @@ void access_transaction(userList *list, int size)
     return;
 }
 
+bool comparedate(string date, string d)
+{
+    tm time = {}, time2 = {};
+    istringstream datee1(date);
+    datee1 >> get_time(&time, "%d/%m/%Y");
+    istringstream datee2(d);
+    datee2 >> get_time(&time2, "%d/%m/%Y");
+
+    auto t1 = chrono::system_clock::from_time_t(mktime(&time));
+    auto t2 = chrono::system_clock::from_time_t(mktime(&time2));
+    if (t1 > t2)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 userList * sorting(userList *list){
     user *tmp = list->head;
     while (tmp != NULL) {
@@ -889,25 +876,48 @@ userList * sorting(userList *list){
         while (tmp2 != NULL) {
             transaction* current = tmp2->txn;
             while (current != NULL) {
-                transaction* min_value = current;
+                transaction* min_date = current;
                 transaction* tmp3 = current->next;
                 
                 while (tmp3 != NULL) {
-                    if (tmp3->date < min_value->date) {
-                        min_value = tmp3;
+                    if (comparedate(tmp3->date, min_date->date)) {
+                        min_date = tmp3;
                     }
                     tmp3 = tmp3->next;
                 }
                 
-                if (min_value != current) {
-                    transaction* transaction_tmp = new transaction;
-                    transaction_tmp->date = current->date;
-                    transaction_tmp->amount = current->amount;
-                    current->date = min_value->date;
-                    min_value->date = transaction_tmp->date;
-                    current->amount = min_value->amount;
-                    min_value->amount = transaction_tmp->amount;
-                    delete transaction_tmp;
+                if (min_date != current) {
+                    transaction* prev_current = NULL;
+                    transaction* prev_min = NULL;
+                    transaction* iter = tmp2->txn;
+                    
+                    while (iter != NULL) {
+                        if (iter->next == current) {
+                            prev_current = iter;
+                        }
+                        if (iter->next == min_date) {
+                            prev_min = iter;
+                        }
+                        iter = iter->next;
+                    }
+                    
+                    //this is the swap of the nodes
+                    transaction* temp = min_date->next;
+                    
+                    if (prev_current == NULL) { 
+                        tmp2->txn = min_date;
+                    } else {
+                        prev_current->next = min_date;
+                    }
+                    
+                    if (current->next == min_date) {
+                        min_date->next = current;
+                        current->next = temp;
+                    } else {
+                        min_date->next = current->next;
+                        prev_min->next = current;
+                        current->next = temp;
+                    }
                 }
                 
                 current = current->next;
@@ -922,7 +932,7 @@ userList * sorting(userList *list){
 void choice(userList *userlist, int size)
 {
     char x;
-    cout << "\033[1;33m--> ~Press 1 to access a account.\n--> ~Press 2 to add a account.\n--> ~Press 3 to access the transaction menu.\n--> ~Press 0 to exit.\033[0m " << endl;
+    cout << "\033[1;33m--> ~Press 1 to access a account(to add a new account).\n--> ~Press 2 to add a account.\n--> ~Press 3 to access the transaction menu.\n--> ~Press 0 to exit.\033[0m " << endl;
     do
     {
         cin >> x;
