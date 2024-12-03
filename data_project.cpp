@@ -869,59 +869,54 @@ bool comparedate(string date, string d)
     return true;
 }
 
-userList * sorting(userList *list){
-    user *tmp = list->head;
+userList* sorting(userList* list) {
+    user* tmp = list->head;
     while (tmp != NULL) {
         account* tmp2 = tmp->acct;
         while (tmp2 != NULL) {
-            transaction* current = tmp2->txn;
-            while (current != NULL) {
-                transaction* min_date = current;
-                transaction* tmp3 = current->next;
-                
-                while (tmp3 != NULL) {
-                    if (comparedate(tmp3->date, min_date->date)) {
-                        min_date = tmp3;
-                    }
-                    tmp3 = tmp3->next;
-                }
-                
-                if (min_date != current) {
-                    transaction* prev_current = NULL;
-                    transaction* prev_min = NULL;
-                    transaction* iter = tmp2->txn;
-                    
-                    while (iter != NULL) {
-                        if (iter->next == current) {
-                            prev_current = iter;
-                        }
-                        if (iter->next == min_date) {
-                            prev_min = iter;
-                        }
-                        iter = iter->next;
-                    }
-                    
-                    //this is the swap of the nodes
-                    transaction* temp = min_date->next;
-                    
-                    if (prev_current == NULL) { 
-                        tmp2->txn = min_date;
-                    } else {
-                        prev_current->next = min_date;
-                    }
-                    
-                    if (current->next == min_date) {
-                        min_date->next = current;
-                        current->next = temp;
-                    } else {
-                        min_date->next = current->next;
-                        prev_min->next = current;
-                        current->next = temp;
-                    }
-                }
-                
-                current = current->next;
+            bool swapped;
+            transaction* ptr1;
+            transaction* lptr = NULL;
+
+            // If list is empty or has only one element
+            if (tmp2->txn == NULL || tmp2->txn->next == NULL) {
+                tmp2 = tmp2->next;
+                continue;
             }
+
+            do {
+                swapped = false;
+                ptr1 = tmp2->txn;
+
+                while (ptr1->next != lptr) {
+                    if (comparedate(ptr1->next->date, ptr1->date)) {
+                        // Swap nodes
+                        transaction* ptr2 = ptr1->next;
+                        
+                        // Update head if necessary
+                        if (ptr1 == tmp2->txn) {
+                            tmp2->txn = ptr2;
+                        } else {
+                            transaction* prev = tmp2->txn;
+                            while (prev->next != ptr1) {
+                                prev = prev->next;
+                            }
+                            prev->next = ptr2;
+                        }
+
+                        ptr1->next = ptr2->next;
+                        ptr2->next = ptr1;
+                        
+                        // Update ptr1 for next iteration
+                        ptr1 = ptr2;
+                        
+                        swapped = true;
+                    }
+                    ptr1 = ptr1->next;
+                }
+                lptr = ptr1;
+            } while (swapped);
+
             tmp2 = tmp2->next;
         }
         tmp = tmp->next;
