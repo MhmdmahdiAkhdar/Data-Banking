@@ -748,6 +748,7 @@ void sdatecheck(string &date)
 {
    bool x;
     auto now = chrono::system_clock::now();
+    auto yesterday = now - chrono::hours(24);
     do {
         cout << "-->";
         x = true;
@@ -761,7 +762,7 @@ void sdatecheck(string &date)
         } else {
             auto usertime = chrono::system_clock::from_time_t(mktime(&time)); // user input time
             
-            if (usertime > now) {
+            if (usertime > yesterday) {
                 cout << "\033[1;31mPlease enter a date from the past.\033[0m\n";
                 x = false;
             }
