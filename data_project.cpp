@@ -761,7 +761,7 @@ void sdatecheck(string &date)
         } else {
             auto usertime = chrono::system_clock::from_time_t(mktime(&time)); // user input time
             
-            if (usertime >= now) {
+            if (usertime > now) {
                 cout << "\033[1;31mPlease enter a date from the past.\033[0m\n";
                 x = false;
             }
@@ -906,7 +906,6 @@ userList* sorting(userList* list) {
 
                         ptr1->next = ptr2->next;
                         ptr2->next = ptr1;
-                        
                         // Update ptr1 for next iteration
                         ptr1 = ptr2;
                         
