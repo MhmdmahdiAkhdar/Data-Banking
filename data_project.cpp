@@ -655,7 +655,6 @@ void transfer(userList* &list, account* &account1, account* &account2, double am
     ostringstream dnow;
     dnow << std::put_time(localTime, "%d/%m/%Y");
     string dateString = dnow.str();
-    // cout << dateString<<endl;
     bool valid_amount = false;
     double converted_ammount;
     while (valid_amount==false) {
@@ -667,7 +666,6 @@ void transfer(userList* &list, account* &account1, account* &account2, double am
         }
         
         converted_ammount = convert_currency(account1->currency, account2->currency, ammount);
-        cout<<converted_ammount<<endl;
         if (converted_ammount > account2->limitDepositPerDay) {
             cout << "\033[1;31m--> The ammount is greater than the deposit limit of the receiving account.\033[0m\n";
             cout << "\033[1;33mPlease re-enter the amount: \033[0m";
@@ -687,8 +685,6 @@ void transfer(userList* &list, account* &account1, account* &account2, double am
     cout<<"\033[1;33m--> Enter the new limit of the deposit per day(of the second account): \033[0m";
     Deposit_check(account2->limitDepositPerDay);
 
-
-    cout<<"test\n";
     transaction *tmp = account1->txn;
     if(tmp==NULL){
         account1->txn = new transaction;
