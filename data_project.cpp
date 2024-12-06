@@ -349,7 +349,7 @@ user *checklogin(user *head, string first, string last, int ID)
         {
             return travel;
         }
-        travel->previous = travel;
+        // travel->previous = travel;
         travel = travel->next;
     }
     cout << "\033[1;31m--> There is no account with this information.\033[0m\n";
