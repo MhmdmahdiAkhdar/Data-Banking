@@ -53,7 +53,6 @@ void print(userList *);
 void access_transaction(userList *, int);
 void transaction_access_2_accounts(userList *, int );
 
-// the function read from file is done and tested every thing is working fine including the transactions
 userList *readFromFile(userList *list)
 {
 
@@ -183,35 +182,6 @@ userList *readFromFile(userList *list)
     return list;
 }
 
-// prints every thing this may be deleted later on
-void print(userList *list)
-{
-    user *travel = list->head;
-    while (travel != NULL)
-    {
-        cout << "-" << travel->userID << setw(20) << travel->fname << setw(20) << travel->lname << endl;
-
-        account *currentAccount = travel->acct;
-        while (currentAccount != NULL)
-        {
-            cout << "#" << currentAccount->IBAN << "," << currentAccount->accountName << ","
-                 << currentAccount->balance << currentAccount->currency << ","
-                 << currentAccount->limitDepositPerDay << ","
-                 << currentAccount->limitWithdrawPerMonth << endl;
-
-            transaction *currentTxn = currentAccount->txn;
-            while (currentTxn != NULL)
-            {
-                cout << "*" << currentTxn->date << "," << currentTxn->amount << endl;
-                currentTxn = currentTxn->next;
-            }
-
-            currentAccount = currentAccount->next;
-        }
-        travel = travel->next;
-    }
-    return;
-}
 int sizereaderusr()
 {
     fstream file;
@@ -561,6 +531,10 @@ void add_to_txt_file(userList *list)
     user *travel = list->head;
     int q = 0;
     input.open("input.txt", ios::out);
+    if (!input.is_open()) {
+        cout << "\033[1;31m--> Error opening file for writing.\033[0m\n";
+        return;
+    }
 
     while (travel != NULL)
     {
@@ -593,6 +567,7 @@ void add_to_txt_file(userList *list)
             }
             tmp2 = tmp2->next;
         }
+        travel->previous=travel;
         travel = travel->next;
     }
     input.close();
@@ -915,6 +890,7 @@ userList* sorting(userList* list) {
 
             tmp2 = tmp2->next;
         }
+        tmp->previous=tmp;
         tmp = tmp->next;
     }
     return list;
@@ -964,10 +940,7 @@ int main()
     list->tail = NULL;
     list = readFromFile(list);
     int size = sizereaderusr();
-    // transaction_btw_2accs(list, size);
     cout << endl;
     choice(list, size);
-    // the print function is changing the format after it prints so it the lists wont work after entering it be care full change it later also fix the setw() in it so it can calculat the length
-    print(list);
     delete list;
 }
