@@ -576,7 +576,7 @@ void add_to_txt_file(userList *list)
 
 double convert_currency(string currency_1, string currency_2,double amount) {
     double LL_rate = 89000;  
-    double euro_rate = 0.85;   
+    double euro_rate = 0.95;   
     
     if (currency_1 == currency_2) {
         return amount;
