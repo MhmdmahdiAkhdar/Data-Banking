@@ -51,7 +51,7 @@ void access(userList *list, int size);
 void accesschoice(userList *list, int size, int ID);
 void print(userList *);
 void access_transaction(userList *, int);
-void transaction_access_2_accounts(userList *, int );
+void transaction_access_2_accounts(userList *, int);
 
 userList *readFromFile(userList *list)
 {
@@ -367,33 +367,44 @@ void currency_get(string &currency)
     if (currency == "1")
         currency = "\u20AC";
 }
-void Deposit_check(double &balance) {
+void Deposit_check(double &balance)
+{
     string blc;
     bool x;
     int z, y;
-    do {
+    do
+    {
         z = y = 0;
         getline(cin, blc);
-        for (int i = 0; i < blc.length(); i++) {
-            if (blc[i] == '.') {
+        for (int i = 0; i < blc.length(); i++)
+        {
+            if (blc[i] == '.')
+            {
                 z++;
             }
-            if (!isdigit(blc[i]) && blc[i] != '.') {
+            if (!isdigit(blc[i]) && blc[i] != '.')
+            {
                 y++;
             }
         }
-        for (char c : blc) {
-            if (!isdigit(c)) {
+        for (char c : blc)
+        {
+            if (!isdigit(c))
+            {
                 y++;
                 break;
             }
-            if ((z == 1 || z == 0) && y == 0) {
+            if ((z == 1 || z == 0) && y == 0)
+            {
                 x = true;
-            } else {
+            }
+            else
+            {
                 x = false;
             }
         }
-        if (x == false) {
+        if (x == false)
+        {
             cout << "\033[1;31m--> Invalid choice.\033[0m\n\033[1;32m-->Enter the correct form:  \033[0m";
         }
     } while (x == false);
@@ -531,7 +542,8 @@ void add_to_txt_file(userList *list)
     user *travel = list->head;
     int q = 0;
     input.open("input.txt", ios::out);
-    if (!input.is_open()) {
+    if (!input.is_open())
+    {
         cout << "\033[1;31m--> Error opening file for writing.\033[0m\n";
         return;
     }
@@ -567,49 +579,66 @@ void add_to_txt_file(userList *list)
             }
             tmp2 = tmp2->next;
         }
-        travel->previous=travel;
+        travel->previous = travel;
         travel = travel->next;
     }
     input.close();
     return;
 }
 
-double convert_currency(string currency_1, string currency_2,double amount) {
-    double LL_rate = 89000;  
-    double euro_rate = 0.95;   
-    
-    if (currency_1 == currency_2) {
+double convert_currency(string currency_1, string currency_2, double amount)
+{
+    double LL_rate = 89000;
+    double euro_rate = 0.95;
+
+    if (currency_1 == currency_2)
+    {
         return amount;
     }
-    
+
     double usd_amount;
-    
-    if (currency_1 == "L.L") {
+
+    if (currency_1 == "L.L")
+    {
         usd_amount = amount / LL_rate;
-    } else if (currency_1 != "$" && currency_1 != "L.L") {
+    }
+    else if (currency_1 != "$" && currency_1 != "L.L")
+    {
         usd_amount = amount / euro_rate;
-    } else { 
+    }
+    else
+    {
         usd_amount = amount;
     }
-    
-    if (currency_2 == "L.L") {
+
+    if (currency_2 == "L.L")
+    {
         return usd_amount * LL_rate;
-    } else if (currency_2 != "$" && currency_2 != "L.L") {
+    }
+    else if (currency_2 != "$" && currency_2 != "L.L")
+    {
         return usd_amount * euro_rate;
-    } else {  
+    }
+    else
+    {
         return usd_amount;
     }
 }
 
-account* findAccountByIBAN(userList* list, string& IBAN) {
-    account* foundAccount = NULL;
-    do {
+account *findAccountByIBAN(userList *list, string &IBAN)
+{
+    account *foundAccount = NULL;
+    do
+    {
         getline(cin, IBAN);
-        user* currentUser = list->head;
-        while (currentUser != NULL) {
-            account* currentAccount = currentUser->acct;
-            while (currentAccount != NULL) {
-                if (currentAccount->IBAN == IBAN) {
+        user *currentUser = list->head;
+        while (currentUser != NULL)
+        {
+            account *currentAccount = currentUser->acct;
+            while (currentAccount != NULL)
+            {
+                if (currentAccount->IBAN == IBAN)
+                {
                     foundAccount = currentAccount;
                     return foundAccount;
                 }
@@ -617,163 +646,187 @@ account* findAccountByIBAN(userList* list, string& IBAN) {
             }
             currentUser = currentUser->next;
         }
-        
-        if (foundAccount==NULL) {
+
+        if (foundAccount == NULL)
+        {
             cout << "\033[1;31mNo account found with this IBAN.\033[0m" << endl;
             cout << "\033[1;33mPlease re-enter the IBAN: \033[0m";
         }
-    } while (foundAccount==NULL);
-    
+    } while (foundAccount == NULL);
+
     return foundAccount;
 }
-void transfer(userList* &list, account* &account1, account* &account2, double ammount,int size){
+void transfer(userList *&list, account *&account1, account *&account2, double ammount, int size)
+{
     ostringstream dnow;
     dnow << std::put_time(localTime, "%d/%m/%Y");
     string dateString = dnow.str();
     bool valid_amount = false;
     double converted_ammount;
-    while (valid_amount==false) {
-        if (ammount > account1->limitWithdrawPerMonth) {
+    while (valid_amount == false)
+    {
+        if (ammount > account1->limitWithdrawPerMonth)
+        {
             cout << "\033[1;31m--> The ammount is greater than the withdraw limit of the account.\033[0m\n";
             cout << "\033[1;33mPlease re-enter the amount: \033[0m";
             Deposit_check(ammount);
             continue;
         }
-        
+
         converted_ammount = convert_currency(account1->currency, account2->currency, ammount);
-        if (converted_ammount > account2->limitDepositPerDay) {
+        if (converted_ammount > account2->limitDepositPerDay)
+        {
             cout << "\033[1;31m--> The ammount is greater than the deposit limit of the receiving account.\033[0m\n";
             cout << "\033[1;33mPlease re-enter the amount: \033[0m";
             Deposit_check(ammount);
             continue;
         }
-        
+
         valid_amount = true;
     }
     account1->balance -= ammount;
-    cout<<"\033[1;33m--> Enter the new limit of the withdraw per month(of the first account): \033[0m";
+    cout << "\033[1;33m--> Enter the new limit of the withdraw per month(of the first account): \033[0m";
     Deposit_check(account1->limitWithdrawPerMonth);
-    cout<<"\033[1;33m--> Enter the new limit of the deposit per day(of the first account): \033[0m";
+    cout << "\033[1;33m--> Enter the new limit of the deposit per day(of the first account): \033[0m";
     Deposit_check(account1->limitDepositPerDay);
-    cout<<"\033[1;33m--> Enter the new limit of the withdraw per month(of the second account): \033[0m";
+    cout << "\033[1;33m--> Enter the new limit of the withdraw per month(of the second account): \033[0m";
     Deposit_check(account2->limitWithdrawPerMonth);
-    cout<<"\033[1;33m--> Enter the new limit of the deposit per day(of the second account): \033[0m";
+    cout << "\033[1;33m--> Enter the new limit of the deposit per day(of the second account): \033[0m";
     Deposit_check(account2->limitDepositPerDay);
 
     transaction *tmp = account1->txn;
-    if(tmp==NULL){
+    if (tmp == NULL)
+    {
         account1->txn = new transaction;
         account1->txn->date = dateString;
         account1->txn->amount = -ammount;
         account1->txn->next = NULL;
     }
-    else{
-    while(tmp->next != NULL){
-        tmp = tmp->next;
-    }
-    tmp->next = new transaction;
-    tmp->next->date = dateString;
-    tmp->next->amount = -ammount;
-    tmp->next->next = NULL;
-    account2->balance += converted_ammount;
-        
+    else
+    {
+        while (tmp->next != NULL)
+        {
+            tmp = tmp->next;
+        }
+        tmp->next = new transaction;
+        tmp->next->date = dateString;
+        tmp->next->amount = -ammount;
+        tmp->next->next = NULL;
+        account2->balance += converted_ammount;
     }
     tmp = account2->txn;
-    if(tmp==NULL){
+    if (tmp == NULL)
+    {
         account2->txn = new transaction;
         account2->txn->date = dateString;
         account2->txn->amount = converted_ammount;
         account2->txn->next = NULL;
     }
-    else{
-    while(tmp->next != NULL){
-        tmp = tmp->next;
-    }
-    tmp->next = new transaction;
-    tmp->next->date = dateString;
-    tmp->next->amount = converted_ammount;
-    tmp->next->next = NULL;
+    else
+    {
+        while (tmp->next != NULL)
+        {
+            tmp = tmp->next;
+        }
+        tmp->next = new transaction;
+        tmp->next->date = dateString;
+        tmp->next->amount = converted_ammount;
+        tmp->next->next = NULL;
     }
     cout << "\033[1;32m--> The ammount has been transferred successfully.\033[0m\n";
     return;
 }
-
 
 void transaction_access_2_accounts(userList *list, int size)
 {
     string IBAN1, IBAN2;
     double ammount;
     cout << "\033[1;33mEnter the IBNA of the first User\n\033[0m";
-    account* account1 = findAccountByIBAN(list, IBAN1);
+    account *account1 = findAccountByIBAN(list, IBAN1);
     cout << "\033[1;33mEnter the IBNA of the second User\n \033[0m";
-    account* account2 = findAccountByIBAN(list, IBAN2);
+    account *account2 = findAccountByIBAN(list, IBAN2);
     cout << "\033[1;33mEnter the ammount that you want to transfer(plase note that the currency will be the same as the first account): \033[0m";
     Deposit_check(ammount);
 
-    transfer(list, account1, account2, ammount,size);
+    transfer(list, account1, account2, ammount, size);
     choice(list, size);
 }
 
-//assaf ???
+// assaf ???
 void sdatecheck(string &date)
 {
-   bool x;
+    bool x;
     auto now = chrono::system_clock::now();
     auto yesterday = now - chrono::hours(24);
-    do {
+    do
+    {
         cout << "-->";
         x = true;
         getline(cin, date);
         tm time = {};                         // in ctime lib
         istringstream datee(date);            // s stream
         datee >> get_time(&time, "%d/%m/%Y"); // function format
-        if (datee.fail()) {
+        if (datee.fail())
+        {
             cout << "\033[1;31mInvalid format, please enter a valid one.\033[0m\n";
             x = false;
-        } else {
+        }
+        else
+        {
             auto usertime = chrono::system_clock::from_time_t(mktime(&time)); // user input time
-            
-            if (usertime > yesterday) {
+
+            if (usertime > yesterday)
+            {
                 cout << "\033[1;31mPlease enter a date from the past.\033[0m\n";
                 x = false;
             }
         }
-    } while (!x );
+    } while (!x);
 
-return;
+    return;
 }
 
-userList *delete_transactions(userList *list, string date) {
+userList *delete_transactions(userList *list, string date)
+{
     tm inputTime = {};
     istringstream dateStream(date);
     dateStream >> get_time(&inputTime, "%d/%m/%Y");
-    
+
     user *tmp = list->head;
-    while(tmp != NULL) {
+    while (tmp != NULL)
+    {
         account *tmpacc = tmp->acct;
-        while(tmpacc != NULL) {
+        while (tmpacc != NULL)
+        {
             transaction *tmptran = tmpacc->txn;
             transaction *prev = NULL;
-            
-            while(tmptran != NULL) {
+
+            while (tmptran != NULL)
+            {
                 tm transactionTime = {};
                 istringstream transStream(tmptran->date);
                 transStream >> get_time(&transactionTime, "%d/%m/%Y");
-                
+
                 auto inputDateTime = system_clock::from_time_t(mktime(&inputTime));
                 auto transactionDateTime = system_clock::from_time_t(mktime(&transactionTime));
-                
-                if(inputDateTime >= transactionDateTime) {
-                    if(prev == NULL) {
+
+                if (inputDateTime >= transactionDateTime)
+                {
+                    if (prev == NULL)
+                    {
                         tmpacc->txn = tmptran->next;
                         delete tmptran;
                         tmptran = tmpacc->txn;
-                    } else {
+                    }
+                    else
+                    {
                         prev->next = tmptran->next;
                         delete tmptran;
                         tmptran = prev->next;
                     }
-                } else {
+                }
+                else
+                {
                     prev = tmptran;
                     tmptran = tmptran->next;
                 }
@@ -785,11 +838,13 @@ userList *delete_transactions(userList *list, string date) {
     return list;
 }
 
-void delete_devider(userList * list,int size){
+void delete_devider(userList *list, int size)
+{
+    cout << "\033[1;33mEnter the date (d/m/y)\n";
     string date;
     sdatecheck(date);
-    list=delete_transactions(list, date);
-    access_transaction(list,size);
+    list = delete_transactions(list, date);
+    access_transaction(list, size);
 }
 
 void access_transaction(userList *list, int size)
@@ -808,7 +863,7 @@ void access_transaction(userList *list, int size)
         else if (x == '2')
         {
             cin.ignore();
-            delete_devider(list,size);
+            delete_devider(list, size);
         }
         else if (x == '0')
         {
@@ -841,36 +896,47 @@ bool comparedate(string date, string d)
     return true;
 }
 
-userList* sorting(userList* list) {
-    user* tmp = list->head;
-    while (tmp != NULL) {
-        account* tmp2 = tmp->acct;
-        while (tmp2 != NULL) {
+userList *sorting(userList *list)
+{
+    user *tmp = list->head;
+    while (tmp != NULL)
+    {
+        account *tmp2 = tmp->acct;
+        while (tmp2 != NULL)
+        {
             bool swapped;
-            transaction* ptr1;
-            transaction* lptr = NULL;
+            transaction *ptr1;
+            transaction *lptr = NULL;
 
             // If list is empty or has only one element
-            if (tmp2->txn == NULL || tmp2->txn->next == NULL) {
+            if (tmp2->txn == NULL || tmp2->txn->next == NULL)
+            {
                 tmp2 = tmp2->next;
                 continue;
             }
 
-            do {
+            do
+            {
                 swapped = false;
                 ptr1 = tmp2->txn;
 
-                while (ptr1->next != lptr) {
-                    if (comparedate(ptr1->next->date, ptr1->date)) {
+                while (ptr1->next != lptr)
+                {
+                    if (comparedate(ptr1->next->date, ptr1->date))
+                    {
                         // Swap nodes
-                        transaction* ptr2 = ptr1->next;
-                        
+                        transaction *ptr2 = ptr1->next;
+
                         // Update head if necessary
-                        if (ptr1 == tmp2->txn) {
+                        if (ptr1 == tmp2->txn)
+                        {
                             tmp2->txn = ptr2;
-                        } else {
-                            transaction* prev = tmp2->txn;
-                            while (prev->next != ptr1) {
+                        }
+                        else
+                        {
+                            transaction *prev = tmp2->txn;
+                            while (prev->next != ptr1)
+                            {
                                 prev = prev->next;
                             }
                             prev->next = ptr2;
@@ -880,7 +946,7 @@ userList* sorting(userList* list) {
                         ptr2->next = ptr1;
                         // Update ptr1 for next iteration
                         ptr1 = ptr2;
-                        
+
                         swapped = true;
                     }
                     ptr1 = ptr1->next;
@@ -890,7 +956,7 @@ userList* sorting(userList* list) {
 
             tmp2 = tmp2->next;
         }
-        tmp->previous=tmp;
+        tmp->previous = tmp;
         tmp = tmp->next;
     }
     return list;
@@ -920,7 +986,7 @@ void choice(userList *userlist, int size)
         }
         else if (x == '0')
         {
-            userlist=sorting(userlist);
+            userlist = sorting(userlist);
             add_to_txt_file(userlist);
             cout << "\033[30m-->Thanks for using our service.<--\033[0m\n";
         }
