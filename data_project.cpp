@@ -896,68 +896,144 @@ bool comparedate(string date, string d)
     return true;
 }
 
-userList *sorting(userList *list)
-{
-    user *tmp = list->head;
-    while (tmp != NULL)
-    {
-        account *tmp2 = tmp->acct;
-        while (tmp2 != NULL)
-        {
-            bool swapped;
-            transaction *ptr1;
-            transaction *lptr = NULL;
+// userList *sorting(userList *list)
+// {
+//     user *tmp = list->head;
+//     while (tmp != NULL)
+//     {
+//         account *tmp2 = tmp->acct;
+//         while (tmp2 != NULL)
+//         {
+//             bool swapped;
+//             transaction *ptr1;
+//             transaction *lptr = NULL;
 
-            // If list is empty or has only one element
-            if (tmp2->txn == NULL || tmp2->txn->next == NULL)
-            {
-                tmp2 = tmp2->next;
-                continue;
+//             // If list is empty or has only one element
+//             if (tmp2->txn == NULL || tmp2->txn->next == NULL)
+//             {
+//                 tmp2 = tmp2->next;
+//                 continue;
+//             }
+
+//             do
+//             {
+//                 swapped = false;
+//                 ptr1 = tmp2->txn;
+
+//                 while (ptr1->next != lptr)
+//                 {
+//                     if (comparedate(ptr1->next->date, ptr1->date))
+//                     {
+//                         // Swap nodes
+//                         transaction *ptr2 = ptr1->next;
+
+//                         // Update head if necessary
+//                         if (ptr1 == tmp2->txn)
+//                         {
+//                             tmp2->txn = ptr2;
+//                         }
+//                         else
+//                         {
+//                             transaction *prev = tmp2->txn;
+//                             while (prev->next != ptr1)
+//                             {
+//                                 prev = prev->next;
+//                             }
+//                             prev->next = ptr2;
+//                         }
+
+//                         ptr1->next = ptr2->next;
+//                         ptr2->next = ptr1;
+//                         // Update ptr1 for next iteration
+//                         ptr1 = ptr2;
+
+//                         swapped = true;
+//                     }
+//                     ptr1 = ptr1->next;
+//                 }
+//                 lptr = ptr1;
+//             } while (swapped);
+
+//             tmp2 = tmp2->next;
+//         }
+//         tmp->previous = tmp;
+//         tmp = tmp->next;
+//     }
+//     return list;
+// }
+
+
+transaction* quickSort(transaction* head) {
+
+    if (!head || !head->next) {
+        return head;
+    }
+
+    transaction* pivot = head;
+    transaction* lessHead = nullptr;
+    transaction* lessTail = nullptr;
+    transaction* greaterHead = nullptr;
+    transaction* greaterTail = nullptr;
+    transaction* current = head->next;
+
+    while (current) {
+        if (comparedate(current->date, pivot->date)) {
+
+            if (!lessHead) {
+
+                lessHead = current;
+                lessTail = current;
+            } else {
+
+                lessTail->next = current;
+                lessTail = current;
             }
-
-            do
-            {
-                swapped = false;
-                ptr1 = tmp2->txn;
-
-                while (ptr1->next != lptr)
-                {
-                    if (comparedate(ptr1->next->date, ptr1->date))
-                    {
-                        // Swap nodes
-                        transaction *ptr2 = ptr1->next;
-
-                        // Update head if necessary
-                        if (ptr1 == tmp2->txn)
-                        {
-                            tmp2->txn = ptr2;
-                        }
-                        else
-                        {
-                            transaction *prev = tmp2->txn;
-                            while (prev->next != ptr1)
-                            {
-                                prev = prev->next;
-                            }
-                            prev->next = ptr2;
-                        }
-
-                        ptr1->next = ptr2->next;
-                        ptr2->next = ptr1;
-                        // Update ptr1 for next iteration
-                        ptr1 = ptr2;
-
-                        swapped = true;
-                    }
-                    ptr1 = ptr1->next;
-                }
-                lptr = ptr1;
-            } while (swapped);
-
-            tmp2 = tmp2->next;
+        } else {
+            if (!greaterHead) {
+                greaterHead = current;
+                greaterTail = current;
+            } else {
+                greaterTail->next = current;
+                greaterTail = current;
+            }
         }
-        tmp->previous = tmp;
-        tmp = tmp->next;
+        current = current->next;
+    }
+
+
+    if (lessTail) lessTail->next = nullptr;
+    if (greaterTail) greaterTail->next = nullptr;
+
+
+    lessHead = quickSort(lessHead);
+    greaterHead = quickSort(greaterHead);
+
+
+    if (!lessHead) {
+
+        pivot->next = greaterHead;
+        return pivot;
+    }
+
+
+    transaction* sortedList = lessHead;
+    lessTail->next = pivot; 
+    pivot->next = greaterHead;
+
+    return sortedList; 
+}
+
+userList* sorting(userList* list) {
+    user* currentUser = list->head;
+    while (currentUser != NULL) {
+        account* currentAccount = currentUser->acct;
+        while (currentAccount != NULL) {
+            if (currentAccount->txn != NULL) {
+                currentAccount->txn = quickSort(currentAccount->txn);
+            }
+            currentAccount = currentAccount->next;
+        }
+        currentUser = currentUser->next;
     }
     return list;
 }
